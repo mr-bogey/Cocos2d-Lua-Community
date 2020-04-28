@@ -42,13 +42,6 @@ extern "C" {
 #include "lzlib/lua_zlib.h"
 // lsqlite3
 #include "lsqlite3/lsqlite3.h"
-// lunqlite3
-#include "lunqlite/lunqlite.h"
-// protoc-gen-lua
-#include "protobuf/pb.h"
-// sproto
-LUALIB_API int luaopen_lpeg (lua_State *L);
-LUALIB_API int luaopen_sproto_core(lua_State *L);
 // lua-protobuf
 LUALIB_API int luaopen_lua_pb (lua_State *L);
 
@@ -60,11 +53,7 @@ static luaL_Reg luax_exts[] = {
     {"pack", luaopen_pack}, // lpack
     {"zlib", luaopen_zlib}, // lzlib
     {"lsqlite3", luaopen_lsqlite3}, // lsqlite3
-    {"unqlite", luaopen_lunqlite}, // lunqlite
-    {"pb", luaopen_pb}, // protoc-gen-lua
-    {"lpeg", luaopen_lpeg}, // sproto
-    {"sproto.core", luaopen_sproto_core}, // sproto
-    {"luapb", luaopen_lua_pb}, // lua-protobuf
+    {"pb", luaopen_lua_pb}, // lua-protobuf
     {NULL, NULL}
 };
 
