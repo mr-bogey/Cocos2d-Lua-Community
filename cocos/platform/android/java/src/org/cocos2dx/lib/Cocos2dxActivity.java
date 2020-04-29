@@ -51,7 +51,6 @@ import android.annotation.TargetApi;
 
 import org.cocos2dx.lib.Cocos2dxHelper.Cocos2dxHelperListener;
 import org.cocos2dx.utils.PSNetwork;
-import org.cocos2dx.utils.PSDevice;
 
 import javax.microedition.khronos.egl.EGL10;
 import javax.microedition.khronos.egl.EGLConfig;
@@ -156,7 +155,7 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
         Window window = this.getWindow();
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
 
-        initPermission();
+        PSNetwork.init(this);
     }
 
     //native method,call GLViewImpl::getGLContextAttrs() to get the OpenGL ES context attributions
@@ -356,95 +355,6 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
         } else {
             return !powerManager.isScreenOn();
         }
-    }
-
-    private void initPermission() {
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            String allpermissions[] = {Manifest.permission.ACCESS_NETWORK_STATE, Manifest.permission.READ_PHONE_STATE};
-            String permissions[] = {};
-            boolean needPop = false;
-
-            for (String permission : allpermissions) {
-                if (PackageManager.PERMISSION_DENIED == ContextCompat.checkSelfPermission(this, permission)) {
-                    if (shouldShowRequestPermissionRationale(permission)) {
-                        permissions[permissions.length] = permission;
-                    } else {
-                        needPop = true;
-                    }
-                }
-            }
-
-            if (needPop) {
-                // init Alert strings
-                String title = "请在设置中，开启程序权限, 点击权限。";
-                String conform = "确认";
-                String cancel = "取消";
-                if (Cocos2dxHelper.getCurrentLanguage() != "zh") {
-                    title = "Please grant the permissions in settings.";
-                    conform = "OK";
-                    cancel = "Cancel";
-                }
-                final String fTitle = title;
-                final String fconform = conform;
-                final String fcancel = cancel;
-
-                // on clicked handler
-                final DialogInterface.OnClickListener okHandler = new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Intent intent = new Intent();
-                        intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                        Uri uri = Uri.fromParts("package", getPackageName(), null);
-                        intent.setData(uri);
-                        startActivity(intent);
-                        finish();
-                    }
-                };
-
-                // on clicked handler
-                final DialogInterface.OnClickListener noHandler = new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        finish();
-                    }
-                };
-
-                // new alert
-                sContext.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        new AlertDialog.Builder(sContext)
-                                .setMessage(fTitle)
-                                .setPositiveButton(fconform, okHandler)
-                                .setNegativeButton(fcancel, noHandler)
-                                .create()
-                                .show();
-                    }
-                });
-                return;
-            }
-
-            if (permissions.length > 0) {
-                this.requestPermissions(permissions, 1001);
-                return;
-            }
-        }
-        // final, can safe init PS module
-        PSNetwork.init(this);
-        PSDevice.init(this);
-    }
-
-    @TargetApi(Build.VERSION_CODES.M)
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults){
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        this.hasFocus = true;
-
-        if (requestCode != 1001) { // request code define by me.
-            return;
-        }
-
-        initPermission();
     }
 
     // ===========================================================
