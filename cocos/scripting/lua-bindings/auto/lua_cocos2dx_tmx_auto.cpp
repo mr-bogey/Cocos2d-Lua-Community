@@ -2985,6 +2985,42 @@ tolua_lerror:
     return 0;
 }
 
+int lua_cocos2dx_TMXTiledMap_getTilesets(lua_State* tolua_S)
+{
+	int argc = 0;
+	cocos2d::TMXTiledMap* cobj = nullptr;
+#if COCOS2D_DEBUG >= 1
+	tolua_Error tolua_err;
+#endif
+
+#if COCOS2D_DEBUG >= 1
+	if (!tolua_isusertype(tolua_S, 1, "cc.TMXTiledMap", 0, &tolua_err)) goto tolua_lerror;
+#endif
+	cobj = (cocos2d::TMXTiledMap*)tolua_tousertype(tolua_S, 1, 0);
+#if COCOS2D_DEBUG >= 1
+	if (!cobj)
+	{
+		tolua_error(tolua_S, "invalid 'cobj' in function 'lua_cocos2dx_TMXTiledMap_getTilesets'", nullptr);
+		return 0;
+	}
+#endif
+	argc = lua_gettop(tolua_S) - 1;
+	if (argc == 0) {
+		cocos2d::Vector<cocos2d::TMXTilesetInfo *>& ret = cobj->getTilesets();
+		ccvector_to_luaval(tolua_S, ret);
+		return 1;
+	}
+	luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d \n", "cc.TMXTiledMap:getTilesets", argc, 0);
+	return 0;
+
+#if COCOS2D_DEBUG >= 1
+	tolua_lerror:
+				tolua_error(tolua_S, "#ferror in function 'lua_cocos2dx_TMXTiledMap_getTilesets'.", &tolua_err);
+#endif
+
+				return 0;
+}
+
 int lua_cocos2dx_TMXTiledMap_getResourceFile(lua_State* tolua_S)
 {
     int argc = 0;
@@ -3478,8 +3514,9 @@ int lua_register_cocos2dx_TMXTiledMap(lua_State* tolua_S)
     tolua_function(tolua_S,"setObjectGroups",lua_cocos2dx_TMXTiledMap_setObjectGroups);
     tolua_function(tolua_S,"getProperty",lua_cocos2dx_TMXTiledMap_getProperty);
     tolua_function(tolua_S,"setMapSize",lua_cocos2dx_TMXTiledMap_setMapSize);
-    tolua_function(tolua_S,"getObjectGroup",lua_cocos2dx_TMXTiledMap_getObjectGroup);
+    tolua_function(tolua_S,"getObjectGroup",lua_cocos2dx_TMXTiledMap_getObjectGroup); 
     tolua_function(tolua_S,"getObjectGroups",lua_cocos2dx_TMXTiledMap_getObjectGroups);
+	tolua_function(tolua_S,"getTilesets",lua_cocos2dx_TMXTiledMap_getTilesets);
     tolua_function(tolua_S,"getResourceFile",lua_cocos2dx_TMXTiledMap_getResourceFile);
     tolua_function(tolua_S,"getTileSize",lua_cocos2dx_TMXTiledMap_getTileSize);
     tolua_function(tolua_S,"getMapSize",lua_cocos2dx_TMXTiledMap_getMapSize);

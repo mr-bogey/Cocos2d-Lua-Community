@@ -208,7 +208,7 @@ public:
     void setProperties(const ValueMap& properties) { _properties = properties; }
     
     /** Tilesets */
-    const Vector<TMXTilesetInfo*>& getTilesets() const { return _tilesets; }
+    Vector<TMXTilesetInfo*>& getTilesets() { return _tilesets; }
     TMXTilesetInfo *getTilesetByGID(uint32_t gid) const;
     
     /** Get the description.
