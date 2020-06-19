@@ -1,8 +1,8 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated May 1, 2019. Replaces all prior versions.
+ * Last updated January 1, 2020. Replaces all prior versions.
  *
- * Copyright (c) 2013-2019, Esoteric Software LLC
+ * Copyright (c) 2013-2020, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -15,16 +15,16 @@
  * Spine Editor license and redistribution of the Products in any form must
  * include this license and copyright notice.
  *
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY EXPRESS
- * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN
- * NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS
- * INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
- * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+ * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 #include <spine/spine-cocos2dx.h>
@@ -324,11 +324,13 @@ namespace spine {
 				RegionAttachment* attachment = static_cast<RegionAttachment*>(slot->getAttachment());
 				attachmentVertices = static_cast<AttachmentVertices*>(attachment->getRendererObject());
 
-				// Early exit if attachment is invisible
+                // Early exit if attachment is invisible
+#if 0 // Annotate by u0u0, Can't Early exit here, if slot have child, may curse child vertices incorrect.
 				if (attachment->getColor().a == 0) {
 					_clipper->clipEnd(*slot);
 					continue;
 				}
+#endif
 
 				float* dstTriangleVertices = nullptr;
 				int dstStride = 0; // in floats
@@ -415,8 +417,8 @@ namespace spine {
 
 			color.a *= nodeColor.a * _skeleton->getColor().a * slot->getColor().a;
 			// skip rendering if the color of this attachment is 0
-			if (color.a == 0){
-			_clipper->clipEnd(*slot);
+			if (color.a == 0) {
+                _clipper->clipEnd(*slot);
 				continue;
 			}
 			color.r *= nodeColor.r * _skeleton->getColor().r * slot->getColor().r;
@@ -641,6 +643,7 @@ namespace spine {
 #endif
 
 		DrawNode* drawNode = DrawNode::create();
+        drawNode->setGlobalZOrder(getGlobalZOrder()); 
 
 		// Draw bounding rectangle
 		if (_debugBoundingRect) {
@@ -939,7 +942,7 @@ namespace spine {
 				if (slotIsOutRange(slot, startSlotIndex, endSlotIndex)) {
 					continue;
 				}
-					// Early exit if slot is invisible
+                // Early exit if slot is invisible
 				if (slot.getColor().a == 0) {
 					continue;
 				}
