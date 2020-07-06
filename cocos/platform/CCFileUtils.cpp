@@ -738,6 +738,129 @@ unsigned char* FileUtils::getFileDataFromZip(const std::string& zipFilePath, con
     return buffer;
 }
 
+bool FileUtils::unCompressZip(const std::string &zipFilePath, const std::string &saveDirPath)
+{
+	if (zipFilePath.empty() || saveDirPath.empty())
+	{
+		CCLOG("source zip is null or save path is null!");
+		return false;
+	}
+	std::string fullPath = fullPathForFilename(zipFilePath);
+
+	//打开压缩文件
+	unzFile zipfile = unzOpen(fullPath.c_str());
+	if (!zipfile)
+	{
+		CCLOG("can not open zip file %s", zipFilePath.c_str());
+		return false;
+	}
+
+	//获取zip文件信息
+	unz_global_info global_info;
+	if (unzGetGlobalInfo(zipfile, &global_info) != UNZ_OK)
+	{
+		CCLOG("can not read file global info of %s", zipFilePath.c_str());
+		unzClose(zipfile);
+		return false;
+	}
+
+	const int BUFFER_SIZE = 8192;
+	const int MAX_FILENAME = 512;
+
+	//临时缓存，用于从zip中读取数据，然后将数据给解压后的文件
+	char readBuffer[BUFFER_SIZE];
+	//开始解压缩
+	CCLOG("start uncompressing");
+	uLong i;
+	std::string writePath = getWritablePath();
+	for (i = 0; i < global_info.number_entry; ++i)
+	{
+		//获取压缩包内的文件名
+		unz_file_info fileInfo;
+		char fileName[MAX_FILENAME];
+		if (unzGetCurrentFileInfo(zipfile, &fileInfo, fileName, MAX_FILENAME, NULL, 0, NULL, 0) != UNZ_OK)
+		{
+			CCLOG("can not read file info");
+			unzClose(zipfile);
+			return false;
+		}
+
+		//该文件存放路径
+		std::string fullPath = writePath + saveDirPath + fileName;
+
+		//检测路径是文件夹还是文件
+		const size_t filenameLength = strlen(fileName);
+		if (fileName[filenameLength - 1] == '/')
+		{
+			//该文件是一个文件夹，那么就创建它
+			if (!createDirectory(fullPath.c_str()))
+			{
+				CCLOG("can not create directory %s", fullPath.c_str());
+				unzClose(zipfile);
+				return false;
+			}
+		}
+		else
+		{
+			//该文件是一个文件，那么就提取创建它
+			if (unzOpenCurrentFile(zipfile) != UNZ_OK)
+			{
+				CCLOG("can not open file %s", fileName);
+				unzClose(zipfile);
+				return false;
+			}
+			
+			//创建目标文件
+			FILE *out = fopen(fullPath.c_str(), "wb");
+			if (!out)
+			{
+				CCLOG("can not open destination file %s", fullPath.c_str());
+				unzCloseCurrentFile(zipfile);
+				unzClose(zipfile);
+				return false;
+			}
+
+			//将压缩文件内容写入目标文件
+			int error = UNZ_OK;
+			do
+			{
+				error = unzReadCurrentFile(zipfile, readBuffer, BUFFER_SIZE);
+				if (error < 0)
+				{
+					CCLOG("can not read zip file %s, error code is %d", fileName, error);
+					unzCloseCurrentFile(zipfile);
+					unzClose(zipfile);
+					return false;
+				}
+				if (error > 0)
+				{
+					fwrite(readBuffer, error, 1, out);
+				}
+			} while (error > 0);
+
+			fclose(out);
+		}
+		//关闭当前被解压缩的文件
+		unzCloseCurrentFile(zipfile);
+
+		//如果zip内还有其他文件，则将当前文件指定为下一个待解压的文件
+		if ((i + 1) < global_info.number_entry)
+		{
+			if (unzGoToNextFile(zipfile) != UNZ_OK)
+			{
+				CCLOG("can not read next file");
+				unzClose(zipfile);
+				return false;
+			}
+		}
+	}
+	//解压缩完毕
+	CCLOG("end uncompressing");
+	unzClose(zipfile);
+
+	return true;
+}
+
 void FileUtils::writeValueMapToFile(ValueMap dict, const std::string& fullPath, std::function<void(bool)> callback) const
 {
     
