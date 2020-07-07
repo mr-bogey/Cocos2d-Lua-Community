@@ -36,23 +36,13 @@ import android.os.Bundle;
 import android.os.Message;
 import android.os.PowerManager;
 import android.preference.PreferenceManager.OnActivityResultListener;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.view.WindowManager;
-import android.net.Uri;
-import android.provider.Settings;
-import android.content.DialogInterface;
-import android.app.AlertDialog;
-import android.Manifest;
-import android.annotation.TargetApi;
 
 import org.cocos2dx.lib.Cocos2dxHelper.Cocos2dxHelperListener;
 import org.cocos2dx.utils.PSNetwork;
-
-import java.util.ArrayList;
 
 import javax.microedition.khronos.egl.EGL10;
 import javax.microedition.khronos.egl.EGLConfig;
@@ -348,8 +338,7 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
 
     private static boolean isDeviceLocked() {
         KeyguardManager keyguardManager = (KeyguardManager)getContext().getSystemService(Context.KEYGUARD_SERVICE);
-        boolean locked = keyguardManager.inKeyguardRestrictedInputMode();
-        return locked;
+        return keyguardManager.inKeyguardRestrictedInputMode();
     }
 
     private static boolean isDeviceAsleep() {
@@ -432,7 +421,7 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
                 }
             };
 
-            EGLConfig result = null;
+            EGLConfig result;
             for (int[] eglAtribute : EGLAttributes) {
                 result = this.doChooseConfig(egl, display, eglAtribute);
                 if (result != null)
