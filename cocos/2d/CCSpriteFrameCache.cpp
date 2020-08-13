@@ -521,6 +521,10 @@ void SpriteFrameCache::removeSpriteFramesFromTexture(Texture2D* texture)
 
 SpriteFrame* SpriteFrameCache::getSpriteFrameByName(const std::string& name)
 {
+	if (name.empty())
+	{
+		return NULL;
+	}
     SpriteFrame* frame = _spriteFramesCache.at(name);
     if (!frame)
     {
