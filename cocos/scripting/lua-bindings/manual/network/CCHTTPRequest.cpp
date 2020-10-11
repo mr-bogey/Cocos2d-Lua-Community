@@ -68,6 +68,7 @@ bool HTTPRequest::initWithUrl(const char *url, int method)
             CCLOG("HTTPRequest::initWithUrl() Can't open temp file");
             return false;
         }
+        fseek(m_file, 0L, SEEK_END);
         m_resumeSize = ftell(m_file);
     }
     
@@ -390,6 +391,9 @@ void HTTPRequest::update(float dt)
             case kCCHTTPRequestStateCompleted:
                 dict["name"] = LuaValue::stringValue("completed");
                 if (m_savePath.length() > 0) { // rename tmp file to savePath
+                    if (FileUtils::getInstance()->isFileExist(m_savePath)) {
+                        FileUtils::getInstance()->removeFile(m_savePath);
+                    }
                     FileUtils::getInstance()->renameFile(m_savePath + TMP_SUFFIX, m_savePath);
                 }
                 break;
