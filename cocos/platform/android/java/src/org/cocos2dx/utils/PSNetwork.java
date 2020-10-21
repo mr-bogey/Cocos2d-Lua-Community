@@ -52,13 +52,9 @@ public class PSNetwork {
 				URL url = new URL(hostName);
 				int state = ((HttpURLConnection) url.openConnection())
 						.getResponseCode();
-				if (state == 200) {
-					return true;
-				}
-				return false;
+				return state == 200;
 			} catch (Exception ex) {
 				counts++;
-				continue;
 			}
 		}
 		return false;
