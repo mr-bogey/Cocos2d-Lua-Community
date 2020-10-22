@@ -119,6 +119,7 @@ bool TMXLayer::initWithLayerInfo(TMXImageLayerInfo *layerInfo, TMXTiledMap *tile
     initCommon(layerInfo->_offset, tileMap);
     // after setContentSize create sprite of image layer
     Sprite * sp = Sprite::create(layerInfo->_sourceImage);
+    sp->getTexture()->setAliasTexParameters();
     sp->setOpacity(_opacity);
     sp->setAnchorPoint(Vec2(0, 1));
     sp->setPositionY(getContentSize().height);
