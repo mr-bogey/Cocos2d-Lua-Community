@@ -10,11 +10,11 @@ set(lua_bindings_manual_headers
     manual/CCLuaBridge.h
     manual/extension/lua_cocos2dx_extension_manual.h
     manual/LuaBasicConversions.h
-    manual/spine/lua_cocos2dx_spine_manual.hpp
-    manual/spine/lua_spSkeletonData.hpp
-    manual/spine/LuaSkeletonAnimation.h
-    manual/dragonBones/lua_dragonBones.hpp
-    manual/fairygui/lua_fairygui.hpp
+    #manual/spine/lua_cocos2dx_spine_manual.hpp
+    #manual/spine/lua_spSkeletonData.hpp
+    #manual/spine/LuaSkeletonAnimation.h
+    #manual/dragonBones/lua_dragonBones.hpp
+    #manual/fairygui/lua_fairygui.hpp
     manual/platform/ios/CCLuaObjcBridge.h
     manual/network/lua_cocos2dx_network_manual.h
     manual/network/Lua_web_socket.h
@@ -66,11 +66,11 @@ set(lua_bindings_manual_files
     manual/network/lua_http_manual.cpp
     manual/network/CCHTTPRequest.cpp
     manual/network/Lua_AsyncTCP.cpp
-    manual/spine/lua_cocos2dx_spine_manual.cpp
-    manual/spine/lua_spSkeletonData.cpp
-    manual/spine/LuaSkeletonAnimation.cpp
-    manual/dragonBones/lua_dragonBones.cpp
-    manual/fairygui/lua_fairygui.cpp
+    #manual/spine/lua_cocos2dx_spine_manual.cpp
+    #manual/spine/lua_spSkeletonData.cpp
+    #manual/spine/LuaSkeletonAnimation.cpp
+    #manual/dragonBones/lua_dragonBones.cpp
+    #manual/fairygui/lua_fairygui.cpp
     manual/ui/lua_cocos2dx_ui_manual.cpp
     manual/physics3d/lua_cocos2dx_physics3d_manual.cpp
     manual/navmesh/lua_cocos2dx_navmesh_conversions.cpp
@@ -82,7 +82,7 @@ set(lua_bindings_manual_files
 set(lua_bindings_auto_headers
     auto/lua_cocos2dx_3d_auto.hpp
     auto/lua_cocos2dx_controller_auto.hpp
-    auto/lua_cocos2dx_spine_auto.hpp
+    #auto/lua_cocos2dx_spine_auto.hpp
     auto/lua_cocos2dx_studio_auto.hpp
     auto/lua_cocos2dx_auto.hpp
     auto/lua_cocos2dx_navmesh_auto.hpp
@@ -101,7 +101,7 @@ set(lua_bindings_auto_files
     auto/lua_cocos2dx_controller_auto.cpp
     auto/lua_cocos2dx_extension_auto.cpp
     auto/lua_cocos2dx_physics_auto.cpp
-    auto/lua_cocos2dx_spine_auto.cpp
+    #auto/lua_cocos2dx_spine_auto.cpp
     auto/lua_cocos2dx_studio_auto.cpp
     auto/lua_cocos2dx_csloader_auto.cpp
     auto/lua_cocos2dx_ui_auto.cpp
@@ -175,8 +175,8 @@ target_link_libraries(luacocos2d ${lua_ext_depend})
 target_include_directories(luacocos2d
     PRIVATE manual/platform/android
     PRIVATE manual/platform/android/jni
-    PRIVATE ${cocos_root}/cocos/editor-support/dragonBones
-    PRIVATE ${cocos_root}/cocos/editor-support/fairygui
+    #PRIVATE ${cocos_root}/cocos/editor-support/dragonBones
+    #PRIVATE ${cocos_root}/cocos/editor-support/fairygui
     PRIVATE ${cocos_root}/external/lua/luasocket
     INTERFACE ${cocos_root}/cocos/scripting/lua-bindings/auto
     INTERFACE ${cocos_root}/cocos/scripting/lua-bindings/manual
