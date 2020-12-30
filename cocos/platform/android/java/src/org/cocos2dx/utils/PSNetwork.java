@@ -5,7 +5,10 @@ import java.net.URL;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
-import android.net.NetworkInfo.State;
+import android.net.Network;
+import android.net.NetworkCapabilities;
+import android.net.NetworkInfo;
+import android.os.Build;
 
 public class PSNetwork {
 	static ConnectivityManager mConnManager = null;
@@ -19,9 +22,17 @@ public class PSNetwork {
 		if (mConnManager == null) {
 			return false;
 		}
-		State state = mConnManager
-				.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState();
-		return State.CONNECTED == state;
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M){
+			NetworkInfo info = mConnManager.getActiveNetworkInfo();
+			return info != null && info.isConnected() && info.getType() == ConnectivityManager.TYPE_WIFI;
+		}else{
+			Network network = mConnManager.getActiveNetwork();
+			if (network != null){
+				NetworkCapabilities capabilities = mConnManager.getNetworkCapabilities(network);
+				return capabilities != null && capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI);
+			}
+			return false;
+		}
 	}
 
 	public static boolean isInternetConnectionAvailable() {
@@ -31,13 +42,17 @@ public class PSNetwork {
 
 		if (isLocalWiFiAvailable()) {
 			return true;
-		} 
-		
-		try {
-			State state = mConnManager.getNetworkInfo(
-					ConnectivityManager.TYPE_MOBILE).getState();
-			return State.CONNECTED == state;
-		} catch (Exception e) { 
+		}
+
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M){
+			NetworkInfo info = mConnManager.getActiveNetworkInfo();
+			return info != null && info.isConnected() && info.getType() == ConnectivityManager.TYPE_MOBILE;
+		}else{
+			Network network = mConnManager.getActiveNetwork();
+			if (network != null){
+				NetworkCapabilities capabilities = mConnManager.getNetworkCapabilities(network);
+				return capabilities != null && capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR);
+			}
 			return false;
 		}
 	}

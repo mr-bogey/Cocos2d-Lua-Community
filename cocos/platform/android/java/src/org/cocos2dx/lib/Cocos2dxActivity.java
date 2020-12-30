@@ -239,23 +239,23 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
     public void init() {
         
         // FrameLayout
-        ViewGroup.LayoutParams framelayout_params =
+        ViewGroup.LayoutParams frame_layout_params =
             new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                                        ViewGroup.LayoutParams.MATCH_PARENT);
 
         mFrameLayout = new ResizeLayout(this);
 
-        mFrameLayout.setLayoutParams(framelayout_params);
+        mFrameLayout.setLayoutParams(frame_layout_params);
 
         // Cocos2dxEditText layout
-        ViewGroup.LayoutParams edittext_layout_params =
+        ViewGroup.LayoutParams edit_text_layout_params =
             new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                                        ViewGroup.LayoutParams.WRAP_CONTENT);
-        Cocos2dxEditBox edittext = new Cocos2dxEditBox(this);
-        edittext.setLayoutParams(edittext_layout_params);
+        Cocos2dxEditBox edit_text = new Cocos2dxEditBox(this);
+        edit_text.setLayoutParams(edit_text_layout_params);
 
 
-        mFrameLayout.addView(edittext);
+        mFrameLayout.addView(edit_text);
 
         // Cocos2dxGLSurfaceView
         this.mGLSurfaceView = this.onCreateView();
@@ -269,7 +269,7 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
         //   this.mGLSurfaceView.setEGLConfigChooser(8, 8, 8, 8, 16, 0);
 
         this.mGLSurfaceView.setCocos2dxRenderer(new Cocos2dxRenderer());
-        this.mGLSurfaceView.setCocos2dxEditText(edittext);
+        this.mGLSurfaceView.setCocos2dxEditText(edit_text);
 
         // Set framelayout as the content view
         setContentView(mFrameLayout);
@@ -293,47 +293,43 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
             return;
         }
 
-        if (Build.VERSION.SDK_INT >= 19) {
-            // use reflection to remove dependence of API level
+        Class<View> viewClass = View.class;
 
-            Class viewClass = View.class;
+        try {
+            final int SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION = Cocos2dxReflectionHelper.<Integer>getConstantValue(viewClass, "SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION");
+            final int SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN = Cocos2dxReflectionHelper.<Integer>getConstantValue(viewClass, "SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN");
+            final int SYSTEM_UI_FLAG_HIDE_NAVIGATION = Cocos2dxReflectionHelper.<Integer>getConstantValue(viewClass, "SYSTEM_UI_FLAG_HIDE_NAVIGATION");
+            final int SYSTEM_UI_FLAG_FULLSCREEN = Cocos2dxReflectionHelper.<Integer>getConstantValue(viewClass, "SYSTEM_UI_FLAG_FULLSCREEN");
+            final int SYSTEM_UI_FLAG_IMMERSIVE_STICKY = Cocos2dxReflectionHelper.<Integer>getConstantValue(viewClass, "SYSTEM_UI_FLAG_IMMERSIVE_STICKY");
+            final int SYSTEM_UI_FLAG_LAYOUT_STABLE = Cocos2dxReflectionHelper.<Integer>getConstantValue(viewClass, "SYSTEM_UI_FLAG_LAYOUT_STABLE");
 
-            try {
-                final int SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION = Cocos2dxReflectionHelper.<Integer>getConstantValue(viewClass, "SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION");
-                final int SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN = Cocos2dxReflectionHelper.<Integer>getConstantValue(viewClass, "SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN");
-                final int SYSTEM_UI_FLAG_HIDE_NAVIGATION = Cocos2dxReflectionHelper.<Integer>getConstantValue(viewClass, "SYSTEM_UI_FLAG_HIDE_NAVIGATION");
-                final int SYSTEM_UI_FLAG_FULLSCREEN = Cocos2dxReflectionHelper.<Integer>getConstantValue(viewClass, "SYSTEM_UI_FLAG_FULLSCREEN");
-                final int SYSTEM_UI_FLAG_IMMERSIVE_STICKY = Cocos2dxReflectionHelper.<Integer>getConstantValue(viewClass, "SYSTEM_UI_FLAG_IMMERSIVE_STICKY");
-                final int SYSTEM_UI_FLAG_LAYOUT_STABLE = Cocos2dxReflectionHelper.<Integer>getConstantValue(viewClass, "SYSTEM_UI_FLAG_LAYOUT_STABLE");
-
-                // getWindow().getDecorView().setSystemUiVisibility();
-                final Object[] parameters = new Object[]{SYSTEM_UI_FLAG_LAYOUT_STABLE
-                        | SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                        | SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                        | SYSTEM_UI_FLAG_HIDE_NAVIGATION // hide nav bar
-                        | SYSTEM_UI_FLAG_FULLSCREEN // hide status bar
-                        | SYSTEM_UI_FLAG_IMMERSIVE_STICKY};
-                Cocos2dxReflectionHelper.<Void>invokeInstanceMethod(getWindow().getDecorView(),
-                        "setSystemUiVisibility",
-                        new Class[]{Integer.TYPE},
-                        parameters);
-            } catch (NullPointerException e) {
-                Log.e(TAG, "hideVirtualButton", e);
-            }
+            // getWindow().getDecorView().setSystemUiVisibility();
+            final Object[] parameters = new Object[]{SYSTEM_UI_FLAG_LAYOUT_STABLE
+                    | SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                    | SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                    | SYSTEM_UI_FLAG_HIDE_NAVIGATION // hide nav bar
+                    | SYSTEM_UI_FLAG_FULLSCREEN // hide status bar
+                    | SYSTEM_UI_FLAG_IMMERSIVE_STICKY};
+            Cocos2dxReflectionHelper.<Void>invokeInstanceMethod(getWindow().getDecorView(),
+                    "setSystemUiVisibility",
+                    new Class[]{Integer.TYPE},
+                    parameters);
+        } catch (NullPointerException e) {
+            Log.e(TAG, "hideVirtualButton", e);
         }
     }
 
-   private static boolean isAndroidEmulator() {
-      String model = Build.MODEL;
-      Log.d(TAG, "model=" + model);
-      String product = Build.PRODUCT;
-      Log.d(TAG, "product=" + product);
-      boolean isEmulator = false;
-      if (product != null) {
-         isEmulator = product.equals("sdk") || product.contains("_sdk") || product.contains("sdk_");
-      }
-      Log.d(TAG, "isEmulator=" + isEmulator);
-      return isEmulator;
+    private static boolean isAndroidEmulator() {
+        String model = Build.MODEL;
+        Log.d(TAG, "model=" + model);
+        String product = Build.PRODUCT;
+        Log.d(TAG, "product=" + product);
+        boolean isEmulator = false;
+        if (product != null) {
+            isEmulator = product.equals("sdk") || product.contains("_sdk") || product.contains("sdk_");
+        }
+        Log.d(TAG, "isEmulator=" + isEmulator);
+        return isEmulator;
    }
 
     private static boolean isDeviceLocked() {
@@ -346,11 +342,7 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
         if(powerManager == null) {
             return false;
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
-            return !powerManager.isInteractive();
-        } else {
-            return !powerManager.isScreenOn();
-        }
+        return !powerManager.isInteractive();
     }
 
     // ===========================================================
@@ -422,8 +414,8 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
             };
 
             EGLConfig result;
-            for (int[] eglAtribute : EGLAttributes) {
-                result = this.doChooseConfig(egl, display, eglAtribute);
+            for (int[] eglAttribute : EGLAttributes) {
+                result = this.doChooseConfig(egl, display, eglAttribute);
                 if (result != null)
                     return result;
             }
