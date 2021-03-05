@@ -361,6 +361,7 @@ void SpriteFrameCache::addSpriteFramesWithFile(const std::string& plist)
         return;
     }
 
+    if (isSpriteFramesWithFileLoaded(plist)){return;}
     ValueMap dict = FileUtils::getInstance()->getValueMapFromFile(fullPath);
 
     string texturePath("");
