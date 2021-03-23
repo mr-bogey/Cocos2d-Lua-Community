@@ -2,6 +2,7 @@
 Copyright (c) 2010-2012 cocos2d-x.org
 Copyright (c) 2013-2016 Chukong Technologies Inc.
 Copyright (c) 2017-2018 Xiamen Yaji Software Co., Ltd.
+Copyright (c) 2020-2021 cocos2d-lua.org
 
 http://www.cocos2d-x.org
 
@@ -304,10 +305,8 @@ bool GLViewImpl::initWithRect(const std::string& viewName, Rect rect, float fram
     int neededWidth = rect.size.width * _frameZoomFactor;
     int neededHeight = rect.size.height * _frameZoomFactor;
 
-    _mainWindow = glfwCreateWindow(neededWidth, neededHeight, _viewName.c_str(), _monitor, nullptr);
-
-    if (_mainWindow == nullptr)
-    {
+    _mainWindow = glfwCreateWindow(neededWidth, neededHeight, _viewName.c_str(), nullptr, nullptr);
+    if (!_mainWindow) {
         std::string message = "Can't create window";
         if (!_glfwError.empty())
         {
@@ -377,7 +376,9 @@ bool GLViewImpl::initWithRect(const std::string& viewName, Rect rect, float fram
     glfwSetWindowFocusCallback(_mainWindow, GLFWEventHandler::onGLFWWindowFocusCallback);
 
     setFrameSize(rect.size.width, rect.size.height);
-
+    // center the window
+    const GLFWvidmode *mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+    glfwSetWindowPos(_mainWindow, (mode->width - realW) / 2, (mode->height - realH) / 2);
     return true;
 }
 
@@ -667,11 +668,16 @@ void GLViewImpl::setViewPortInPoints(float x , float y , float w , float h)
 
 void GLViewImpl::setScissorInPoints(float x , float y , float w , float h)
 {
+    auto renderer = Director::getInstance()->getRenderer();
+    if (_isRenderTextureMode) {
+        renderer->setScissorRect(x, y, w, h);
+        return;
+    }
+    
     auto x1 = (int)(x * _scaleX * _retinaFactor * _frameZoomFactor + _viewPortRect.origin.x * _retinaFactor * _frameZoomFactor);
     auto y1 = (int)(y * _scaleY * _retinaFactor  * _frameZoomFactor + _viewPortRect.origin.y * _retinaFactor * _frameZoomFactor);
     auto width1 = (unsigned int)(w * _scaleX * _retinaFactor * _frameZoomFactor);
     auto height1 = (unsigned int)(h * _scaleY * _retinaFactor * _frameZoomFactor);
-    auto renderer = Director::getInstance()->getRenderer();
     renderer->setScissorRect(x1, y1, width1, height1);
 }
 
@@ -679,6 +685,9 @@ Rect GLViewImpl::getScissorRect() const
 {
     auto renderer = Director::getInstance()->getRenderer();
     auto& rect = renderer->getScissorRect();
+    if (_isRenderTextureMode) {
+        return Rect(rect.x, rect.y, rect.width, rect.height);
+    }
 
     float x = (rect.x - _viewPortRect.origin.x * _retinaFactor * _frameZoomFactor) / (_scaleX * _retinaFactor * _frameZoomFactor);
     float y = (rect.y - _viewPortRect.origin.y * _retinaFactor * _frameZoomFactor) / (_scaleY * _retinaFactor  * _frameZoomFactor);
