@@ -458,17 +458,18 @@ int TextField::getFontSize()const
 
 void TextField::setFontName(const std::string& name)
 {
-    if(FileUtils::getInstance()->isFileExist(name))
+    std::string fontName = name.empty() ? "default.ttf" : name;
+    if(FileUtils::getInstance()->isFileExist(fontName))
     {
-        std::string lcName = name;
+        std::string lcName = fontName;
         std::transform(lcName.begin(), lcName.end(), lcName.begin(), ::tolower);
         if(lcName.substr(lcName.length() - 4) == ".fnt") {
-            _textFieldRenderer->setBMFontFilePath(name);
+            _textFieldRenderer->setBMFontFilePath(fontName);
             _fontType = FontType::BMFONT;
         }
         else {
             TTFConfig config = _textFieldRenderer->getTTFConfig();
-            config.fontFilePath = name;
+            config.fontFilePath = fontName;
             config.fontSize = _fontSize;
             _textFieldRenderer->setTTFConfig(config);
             _fontType = FontType::TTF;
@@ -476,14 +477,14 @@ void TextField::setFontName(const std::string& name)
     }
     else
     {
-        _textFieldRenderer->setSystemFontName(name);
+        _textFieldRenderer->setSystemFontName(fontName);
         if (_fontType == FontType::TTF)
         {
             _textFieldRenderer->requestSystemFontRefresh();
         }
         _fontType = FontType::SYSTEM;
     }
-    _fontName = name;
+    _fontName = fontName;
     _textFieldRendererAdaptDirty = true;
     updateContentSizeWithTextureSize(_textFieldRenderer->getContentSize());
 }

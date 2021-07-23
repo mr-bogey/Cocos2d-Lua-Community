@@ -798,22 +798,23 @@ float Button::getZoomScale()const
 void Button::setTitleFontName(const std::string& fontName)
 {
     createTitleRendererIfNull();
-    
-    if(FileUtils::getInstance()->isFileExist(fontName)) {
-        std::string lowerCasedFontName = fontName;
+
+    std::string name = fontName.empty() ? "default.ttf" : fontName;
+    if(FileUtils::getInstance()->isFileExist(name)) {
+        std::string lowerCasedFontName = name;
         std::transform(lowerCasedFontName.begin(), lowerCasedFontName.end(), lowerCasedFontName.begin(), ::tolower);
         if (lowerCasedFontName.find(".fnt") != std::string::npos) {
-            _titleRenderer->setBMFontFilePath(fontName);
+            _titleRenderer->setBMFontFilePath(name);
         } else {
             TTFConfig config = _titleRenderer->getTTFConfig();
-            config.fontFilePath = fontName;
+            config.fontFilePath = name;
             config.fontSize = _titleRenderer->getRenderingFontSize();
             _titleRenderer->setTTFConfig(config);
         }
     } else {
-        _titleRenderer->setSystemFontName(fontName);
+        _titleRenderer->setSystemFontName(name);
     }
-    _fontName = fontName;
+    _fontName = name;
     updateContentSize();
 }
 
