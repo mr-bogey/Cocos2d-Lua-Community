@@ -861,7 +861,7 @@ void Label::setDimensions(float width, float height)
         _labelDimensions.width = width;
         _labelDimensions.height = height;
 
-        _maxLineWidth = width;
+        _maxLineWidth = _labelWidth;
         _contentDirty = true;
 
         if(_overflow == Overflow::SHRINK){
