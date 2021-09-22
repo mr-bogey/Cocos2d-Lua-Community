@@ -839,7 +839,11 @@ void Label::setMaxLineWidth(float maxLineWidth)
 {
     if (_labelWidth == 0 && _maxLineWidth != maxLineWidth)
     {
-        _maxLineWidth = maxLineWidth;
+        if (_currentLabelType == LabelType::STRING_TEXTURE || _currentLabelType == LabelType::TTF) {
+            _maxLineWidth = maxLineWidth * s_TTFScaleFactor;
+        } else {
+            _maxLineWidth = maxLineWidth;
+        }
         _contentDirty = true;
     }
 }
@@ -1713,18 +1717,14 @@ void Label::draw(Renderer *renderer, const Mat4 &transform, uint32_t flags)
     {
         return;
     }
-    // Don't do calculate the culling if the transform was not updated
-    bool transformUpdated = flags & FLAGS_TRANSFORM_DIRTY;
+
 #if CC_USE_CULLING
+    // Don't calculate the culling if the transform was not updated
     auto visitingCamera = Camera::getVisitingCamera();
-    auto defaultCamera = Camera::getDefaultCamera();
-    if (visitingCamera == defaultCamera) {
-        _insideBounds = (transformUpdated || visitingCamera->isViewProjectionUpdated()) ? renderer->checkVisibility(transform, _contentSize) : _insideBounds;
-    }
+    if (visitingCamera == nullptr)
+        _insideBounds = true;
     else
-    {
-        _insideBounds = renderer->checkVisibility(transform, _contentSize);
-    }
+        _insideBounds = ((flags & FLAGS_TRANSFORM_DIRTY) || visitingCamera->isViewProjectionUpdated()) ? renderer->checkVisibility(transform, _contentSize) : _insideBounds;
 
     if (_insideBounds)
 #endif

@@ -513,7 +513,7 @@ bool UIPackage::loadPackage(ByteBuffer* buffer)
     cnt = buffer->readShort();
     for (int i = 0; i < cnt; i++)
     {
-        int nextPos = buffer->readShort();
+        int nextPos = buffer->readUshort();
         nextPos += buffer->getPos();
 
         const string& itemId = buffer->readS();
@@ -601,54 +601,40 @@ void* UIPackage::getItemAsset(PackageItem* item)
 
 void UIPackage::loadAtlas(PackageItem* item)
 {
-    Image* image = new Image();
-#if COCOS2D_VERSION < 0x00031702
-    Image::setPNGPremultipliedAlphaEnabled(false);
-#endif
-    if (!image->initWithImageFile(item->file))
-    {
-        item->texture = _emptyTexture;
-        _emptyTexture->retain();
-        delete image;
-#if COCOS2D_VERSION < 0x00031702
-        Image::setPNGPremultipliedAlphaEnabled(true);
-#endif
-        CCLOGWARN("FairyGUI: texture '%s' not found in %s", item->file.c_str(), _name.c_str());
-        return;
-    }
-#if COCOS2D_VERSION < 0x00031702
-    Image::setPNGPremultipliedAlphaEnabled(true);
-#endif
-
-    Texture2D* tex = new Texture2D();
-    tex->initWithImage(image);
-    item->texture = tex;
-    delete image;
-
-    string alphaFilePath;
-    string ext = FileUtils::getInstance()->getFileExtension(item->file);
-    size_t pos = item->file.find_last_of('.');
-    if (pos != -1)
-        alphaFilePath = item->file.substr(0, pos) + "!a" + ext;
-    else
-        alphaFilePath = item->file + "!a" + ext;
-
-    bool hasAlphaTexture = ToolSet::isFileExist(alphaFilePath);
-    if (hasAlphaTexture)
-    {
-        image = new Image();
-        if (!image->initWithImageFile(alphaFilePath))
-        {
-            delete image;
+    TextureCache* textureCache = Director::getInstance()->getTextureCache();
+    Texture2D* tex = textureCache->getTextureForKey(item->file);
+    if (!tex) {
+        tex = textureCache->addImage(item->file);
+        if (!tex) {
+            item->texture = _emptyTexture;
+            _emptyTexture->retain();
+            CCLOGWARN("FairyGUI: texture '%s' not found in %s", item->file.c_str(), _name.c_str());
             return;
         }
+        item->texture = tex;
 
-        tex = new Texture2D();
-        tex->initWithImage(image);
-        item->texture->setAlphaTexture(tex);
-        tex->release();
-        delete image;
+        // check if has Alpha Texture
+        string alphaFilePath;
+        string ext = FileUtils::getInstance()->getFileExtension(item->file);
+        size_t pos = item->file.find_last_of('.');
+        if (pos != -1)
+            alphaFilePath = item->file.substr(0, pos) + "!a" + ext;
+        else
+            alphaFilePath = item->file + "!a" + ext;
+
+        bool hasAlphaTexture = ToolSet::isFileExist(alphaFilePath);
+        if (hasAlphaTexture) {
+            Image *image = new Image();
+            if (image->initWithImageFile(alphaFilePath)) {
+                Texture2D *alphaTex = new Texture2D();
+                alphaTex->initWithImage(image);
+                tex->setAlphaTexture(alphaTex);
+                alphaTex->release();
+            }
+            delete image;
+        }
     }
+    tex->retain();
 }
 
 AtlasSprite* UIPackage::getSprite(const std::string& spriteId)
@@ -722,7 +708,7 @@ void UIPackage::loadMovieClip(PackageItem* item)
 
     for (int i = 0; i < frameCount; i++)
     {
-        int nextPos = buffer->readShort();
+        int nextPos = buffer->readUshort();
         nextPos += buffer->getPos();
 
         Rect rect;
@@ -794,7 +780,7 @@ void UIPackage::loadFont(PackageItem* item)
     int cnt = buffer->readInt();
     for (int i = 0; i < cnt; i++)
     {
-        int nextPos = buffer->readShort();
+        int nextPos = buffer->readUshort();
         nextPos += buffer->getPos();
 
         memset(&def, 0, sizeof(def));
