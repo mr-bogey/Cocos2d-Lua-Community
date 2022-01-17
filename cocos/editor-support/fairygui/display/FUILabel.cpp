@@ -98,10 +98,14 @@ void FUILabel::applyTextFormat()
     //else //Cant call this, cocos will do setRotationSkew(0)!
     //    disableEffect(LabelEffect::ITALICS);
 
-    if (_textFormat->bold && _currentLabelType != LabelType::STRING_TEXTURE)
+    if (_textFormat->bold)
         enableBold();
     else
         disableEffect(LabelEffect::BOLD);
+
+    if (_currentLabelType != LabelType::STRING_TEXTURE) {
+        setAdditionalKerning(_textFormat->letterSpacing);
+    }
 
     setLineSpacing(_textFormat->lineSpacing);
     setHorizontalAlignment(_textFormat->align);

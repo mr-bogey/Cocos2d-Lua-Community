@@ -1302,9 +1302,11 @@ void Label::enableBold()
     if (!_boldEnabled)
     {
         // bold is implemented with outline
-        enableShadow(Color4B::WHITE, Size(0.9f, 0), 0);
+        enableShadow(_textColor, Size(0.9f, 0), 0);
         // add one to kerning
-        setAdditionalKerning(_additionalKerning+1);
+        if (_currentLabelType != LabelType::STRING_TEXTURE) {
+            setAdditionalKerning(_additionalKerning + 1);
+        }
         _boldEnabled = true;
     }
 }
@@ -1374,7 +1376,9 @@ void Label::disableEffect(LabelEffect effect)
         case cocos2d::LabelEffect::BOLD:
             if (_boldEnabled) {
                 _boldEnabled = false;
-                _additionalKerning -= 1;
+                if (_currentLabelType != LabelType::STRING_TEXTURE) {
+                    _additionalKerning -= 1;
+                }
                 disableEffect(LabelEffect::SHADOW);
             }
             break;
@@ -1411,14 +1415,18 @@ void Label::createSpriteForSystemFont(const FontDefinition& fontDef)
 
     auto texture = new (std::nothrow) Texture2D;
     texture->initWithString(_utf8Text.c_str(), fontDef);
-
     _textSprite = Sprite::createWithTexture(texture);
+    texture->release();
     //set camera mask using label's camera mask, because _textSprite may be null when setting camera mask to label
     _textSprite->setCameraMask(getCameraMask());
     _textSprite->setGlobalZOrder(getGlobalZOrder());
     _textSprite->setAnchorPoint(Vec2::ANCHOR_BOTTOM_LEFT);
-    this->setContentSize(_textSprite->getContentSize());
-    texture->release();
+    // fix size to even numbers, label center not in float pos.
+    auto size = _textSprite->getContentSize();
+    size.width = ((int)size.width % 2 == 0) ? (int)size.width : ((int)size.width + 1);
+    size.height = ((int)size.height % 2 == 0) ? (int)size.height : ((int)size.height + 1);
+    this->setContentSize(size);
+
     if (_blendFuncDirty)
     {
         _textSprite->setBlendFunc(_blendFunc);
@@ -1525,7 +1533,7 @@ void Label::updateContent()
         }
     }
 
-    if (_underlineNode)
+    if (_underlineNode && _utf8Text.size() > 0)
     {
         _underlineNode->clear();
 
@@ -1547,7 +1555,7 @@ void Label::updateContent()
                 // Github issue #15214. Uses _displayedColor instead of _textColor for the underline.
                 // This is to have the same behavior of SystemFonts.
                 Color4F color = _underlineColor4B.a > 0 ? Color4F(_underlineColor4B) : Color4F(_displayedColor);
-                _underlineNode->drawLine(Vec2(_linesOffsetX[i],y), Vec2(_linesWidth[i] + _linesOffsetX[i],y), color);
+                _underlineNode->drawLine(Vec2(_linesOffsetX[i] + 1, y), Vec2(_linesWidth[i] + _linesOffsetX[i] - 1, y), color);
             }
         }
         else if (_textSprite)
@@ -1556,13 +1564,12 @@ void Label::updateContent()
             float y = 0;
             const auto spriteSize = _textSprite->getContentSize();
             _underlineNode->setLineWidth(spriteSize.height/6);
-
             if (_strikethroughEnabled)
                 // FIXME: system fonts don't report the height of the font correctly. only the size of the texture, which is POT
                 y += spriteSize.height / 2;
             // FIXME: Might not work with different vertical alignments
             Color4F color = _underlineColor4B.a > 0 ? Color4F(_underlineColor4B) : Color4F(_textSprite->getDisplayedColor());
-            _underlineNode->drawLine(Vec2(0.0f,y), Vec2(spriteSize.width,y), color);
+            _underlineNode->drawLine(Vec2(0.0f + 1, y), Vec2(spriteSize.width - 1, y), color);
         }
     }
 
@@ -2027,23 +2034,20 @@ float Label::getLineSpacing() const
 
 void Label::setAdditionalKerning(float space)
 {
-
-    if (_currentLabelType != LabelType::STRING_TEXTURE)
-    {
+    if (_currentLabelType != LabelType::STRING_TEXTURE) {
         if (_additionalKerning != space)
         {
             _additionalKerning = space;
             _contentDirty = true;
         }
-    }
-    else
+    } else {
         CCLOG("Label::setAdditionalKerning not supported on LabelType::STRING_TEXTURE");
+    }
 }
 
 float Label::getAdditionalKerning() const
 {
     CCASSERT(_currentLabelType != LabelType::STRING_TEXTURE, "Not supported system font!");
-
     return _additionalKerning;
 }
 
@@ -2167,6 +2171,9 @@ void Label::setTextColor(const Color4B &color)
     _textColorF.g = _textColor.g / 255.0f;
     _textColorF.b = _textColor.b / 255.0f;
     _textColorF.a = _textColor.a / 255.0f;
+    if (_boldEnabled) {
+        enableShadow(color, Size(0.9f, 0), 0); // update bold color
+    }
 }
 
 void Label::updateColor()
@@ -2223,8 +2230,12 @@ const Size& Label::getContentSize() const
     }
     // system font and TTF
     if (_currentLabelType == LabelType::STRING_TEXTURE || _currentLabelType == LabelType::TTF) {
-        const_cast<Size*>(&_ttfContentSize)->setSize(ceil(_contentSize.width / s_TTFScaleFactor),
-                                                     ceil(_contentSize.height / s_TTFScaleFactor));
+        // fix size to even numbers, label center not in float pos.
+        int w = ceil(_contentSize.width / s_TTFScaleFactor);
+        int h = ceil(_contentSize.height / s_TTFScaleFactor);
+        w = (w % 2 == 0) ? w : (w + 1);
+        h = (h % 2 == 0) ? h : (h + 1);
+        const_cast<Size*>(&_ttfContentSize)->setSize(w, h); // const_cast make const function happy
         return _ttfContentSize;
     }
     return _contentSize;
@@ -2307,10 +2318,10 @@ FontDefinition Label::_getFontDefinition() const
         systemFontDef._stroke._strokeEnabled = false;
     }
 
-#if (CC_TARGET_PLATFORM != CC_PLATFORM_MAC) && (CC_TARGET_PLATFORM != CC_PLATFORM_ANDROID) && (CC_TARGET_PLATFORM != CC_PLATFORM_IOS)
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_LINUX)
     if (systemFontDef._stroke._strokeEnabled)
     {
-        CCLOGERROR("Stroke Currently only supported on Mac, iOS and Android!");
+        CCLOGERROR("SystemFont Stroke Currently not support on Linux!");
     }
     systemFontDef._stroke._strokeEnabled = false;
 #endif
