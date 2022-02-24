@@ -69,7 +69,6 @@ set(COCOS_CS_HEADER
     editor-support/cocostudio/WidgetReader/SliderReader/SliderReader.h
     editor-support/cocostudio/WidgetReader/ComAudioReader/ComAudioReader.h
     editor-support/cocostudio/WidgetReader/ParticleReader/ParticleReader.h
-    editor-support/cocostudio/WidgetReader/Particle3DReader/Particle3DReader.h
     editor-support/cocostudio/WidgetReader/SkeletonReader/CSBoneBinary_generated.h
     editor-support/cocostudio/WidgetReader/SkeletonReader/SkeletonNodeReader.h
     editor-support/cocostudio/WidgetReader/SkeletonReader/BoneNodeReader.h
@@ -153,7 +152,6 @@ set(COCOS_CS_SRC
     editor-support/cocostudio/WidgetReader/TextReader/TextReader.cpp
     editor-support/cocostudio/WidgetReader/Node3DReader/Node3DReader.cpp
     editor-support/cocostudio/WidgetReader/UserCameraReader/UserCameraReader.cpp
-    editor-support/cocostudio/WidgetReader/Particle3DReader/Particle3DReader.cpp
     editor-support/cocostudio/WidgetReader/Sprite3DReader/Sprite3DReader.cpp
     editor-support/cocostudio/WidgetReader/SkeletonReader/BoneNodeReader.cpp
     editor-support/cocostudio/WidgetReader/SkeletonReader/SkeletonNodeReader.cpp

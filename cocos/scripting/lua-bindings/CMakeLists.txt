@@ -3,12 +3,11 @@ set(cocos_root ${COCOS2DX_ROOT_PATH})
 set(lua_bindings_manual_headers
     manual/audio/lua_audio_manual.h
     manual/CCComponentLua.h
-    manual/3d/lua_cocos2dx_3d_manual.h
+    #manual/3d/lua_cocos2dx_3d_manual.h
     manual/CCLuaStack.h
     manual/CCLuaEngine.h
     manual/lua_module_register.h
     manual/CCLuaBridge.h
-    manual/extension/lua_cocos2dx_extension_manual.h
     manual/LuaBasicConversions.h
     #manual/spine/lua_cocos2dx_spine_manual.hpp
     #manual/spine/lua_spSkeletonData.hpp
@@ -53,13 +52,12 @@ set(lua_bindings_manual_files
     manual/cocos2d/LuaScriptHandlerMgr.cpp
     manual/cocos2d/lua_cocos2dx_manual.cpp
     manual/cocos2d/lua_cocos2dx_physics_manual.cpp
-    manual/3d/lua_cocos2dx_3d_manual.cpp
+    #manual/3d/lua_cocos2dx_3d_manual.cpp
     manual/cocostudio/CustomGUIReader.cpp
     manual/cocostudio/lua_cocos2dx_coco_studio_manual.cpp
     manual/cocostudio/lua-cocos-studio-conversions.cpp
     manual/cocostudio/lua_cocos2dx_csloader_manual.cpp
     manual/controller/lua_cocos2dx_controller_manual.cpp
-    manual/extension/lua_cocos2dx_extension_manual.cpp
     manual/network/lua_extensions.c
     manual/network/lua_cocos2dx_network_manual.cpp
     manual/network/Lua_web_socket.cpp
@@ -80,7 +78,7 @@ set(lua_bindings_manual_files
     )
 
 set(lua_bindings_auto_headers
-    auto/lua_cocos2dx_3d_auto.hpp
+    #auto/lua_cocos2dx_3d_auto.hpp
     auto/lua_cocos2dx_controller_auto.hpp
     #auto/lua_cocos2dx_spine_auto.hpp
     auto/lua_cocos2dx_studio_auto.hpp
@@ -90,16 +88,14 @@ set(lua_bindings_auto_headers
     auto/lua_cocos2dx_physics3d_auto.hpp
     auto/lua_cocos2dx_ui_auto.hpp
     auto/lua_cocos2dx_physics_auto.hpp
-    auto/lua_cocos2dx_extension_auto.hpp
     auto/lua_cocos2dx_backend_auto.hpp
     auto/lua_cocos2dx_tmx_auto.hpp
     )
 
 set(lua_bindings_auto_files
-    auto/lua_cocos2dx_3d_auto.cpp
+    #auto/lua_cocos2dx_3d_auto.cpp
     auto/lua_cocos2dx_auto.cpp
     auto/lua_cocos2dx_controller_auto.cpp
-    auto/lua_cocos2dx_extension_auto.cpp
     auto/lua_cocos2dx_physics_auto.cpp
     #auto/lua_cocos2dx_spine_auto.cpp
     auto/lua_cocos2dx_studio_auto.cpp
