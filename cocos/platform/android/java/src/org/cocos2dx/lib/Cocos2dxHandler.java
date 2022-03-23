@@ -26,7 +26,6 @@ THE SOFTWARE.
 package org.cocos2dx.lib;
 
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.os.Handler;
 import android.os.Message;
 
@@ -41,13 +40,13 @@ public class Cocos2dxHandler extends Handler {
     // ===========================================================
     // Fields
     // ===========================================================
-    private WeakReference<Cocos2dxActivity> mActivity;
+    private final WeakReference<Cocos2dxActivity> mActivity;
     
     // ===========================================================
     // Constructors
     // ===========================================================
     public Cocos2dxHandler(Cocos2dxActivity activity) {
-        this.mActivity = new WeakReference<Cocos2dxActivity>(activity);
+        this.mActivity = new WeakReference<>(activity);
     }
 
     // ===========================================================
@@ -63,10 +62,8 @@ public class Cocos2dxHandler extends Handler {
     // ===========================================================
 
     public void handleMessage(Message msg) {
-        switch (msg.what) {
-            case Cocos2dxHandler.HANDLER_SHOW_DIALOG:
-                showDialog(msg);
-                break;
+        if (msg.what == Cocos2dxHandler.HANDLER_SHOW_DIALOG) {
+            showDialog(msg);
         }
     }
     
@@ -76,14 +73,10 @@ public class Cocos2dxHandler extends Handler {
         new AlertDialog.Builder(theActivity)
         .setTitle(dialogMessage.title)
         .setMessage(dialogMessage.message)
-        .setPositiveButton("Ok", 
-                new DialogInterface.OnClickListener() {
-                    
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        // TODO Auto-generated method stub
-                        
-                    }
+        .setPositiveButton("Ok",
+                (dialog, which) -> {
+                    // TODO Auto-generated method stub
+
                 }).create().show();
     }
 

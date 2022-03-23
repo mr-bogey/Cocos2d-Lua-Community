@@ -27,7 +27,6 @@ package org.cocos2dx.lib;
 import android.content.Context;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
@@ -38,8 +37,6 @@ public class Cocos2dxTextInputWrapper implements TextWatcher, OnEditorActionList
     // ===========================================================
     // Constants
     // ===========================================================
-
-    private static final String TAG = Cocos2dxTextInputWrapper.class.getSimpleName();
 
     // ===========================================================
     // Fields
@@ -124,18 +121,16 @@ public class Cocos2dxTextInputWrapper implements TextWatcher, OnEditorActionList
             }
             
             String text = pTextView.getText().toString();
-            
-            if (text != null) {
-                /* If user input nothing, translate "\n" to engine. */
-                if ( text.compareTo("") == 0) {
-                    text = "\n";
-                }
 
-                if ( '\n' != text.charAt(text.length() - 1)) {
-                    text += '\n';
-                }
+            /* If user input nothing, translate "\n" to engine. */
+            if ( text.compareTo("") == 0) {
+                text = "\n";
             }
-            
+
+            if ( '\n' != text.charAt(text.length() - 1)) {
+                text += '\n';
+            }
+
             final String insertText = text;
             this.mCocos2dxGLSurfaceView.insertText(insertText);
 

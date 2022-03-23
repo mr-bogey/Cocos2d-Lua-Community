@@ -42,7 +42,6 @@ NS_CC_BEGIN
  */
 
 #define CC_DEFAULT_FONT_LABEL_SIZE  12
-
 /**
  * @struct TTFConfig
  * @see `GlyphCollection`
@@ -63,7 +62,7 @@ typedef struct _ttfConfig
     bool underline;
     bool strikethrough;
 
-    _ttfConfig(const std::string& filePath = "",float size = CC_DEFAULT_FONT_LABEL_SIZE, const GlyphCollection& glyphCollection = GlyphCollection::DYNAMIC,
+    _ttfConfig(const std::string& filePath = CC_DEFAULT_FONT, float size = CC_DEFAULT_FONT_LABEL_SIZE, const GlyphCollection& glyphCollection = GlyphCollection::DYNAMIC,
         const char *customGlyphCollection = nullptr, bool useDistanceField = false, int outline = 0,
                bool useItalics = false, bool useBold = false, bool useUnderline = false, bool useStrikethrough = false)
         : fontFilePath(filePath)

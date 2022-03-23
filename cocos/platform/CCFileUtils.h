@@ -279,8 +279,6 @@ public:
      */
     unsigned char* getFileDataFromZip(const std::string& zipFilePath, const std::string& filename, ssize_t *size) const;
 
-	bool unCompressZip(const std::string & zipFilePath, const std::string & saveDirPath);
-
 
     /** Returns the fullpath for a given filename.
 

@@ -100,8 +100,8 @@ void EditBoxImplCommon::initInactiveLabels(const Size& size)
 
     _labelPlaceHolder = Label::create();
     _labelPlaceHolder->setAnchorPoint(Vec2(0.0f, 1.0f));
+    _labelPlaceHolder->setOverflow(Label::Overflow::CLAMP);
     _labelPlaceHolder->setTextColor(Color4B::GRAY);
-    _labelPlaceHolder->enableWrap(false);
     _editBox->addChild(_labelPlaceHolder, kLabelZOrder);
 
     setFont(pDefaultFontName, size.height*2/3);
@@ -119,17 +119,17 @@ void EditBoxImplCommon::placeInactiveLabels(const Size& size)
         _label->setVerticalAlignment(TextVAlignment::TOP);
         _label->enableWrap(true);
 
-        _labelPlaceHolder->setPosition(Vec2((float)CC_EDIT_BOX_PADDING,
-                                            size.height - CC_EDIT_BOX_PADDING));
+        _labelPlaceHolder->setPosition(Vec2((float)CC_EDIT_BOX_PADDING, size.height - CC_EDIT_BOX_PADDING));
         _labelPlaceHolder->setVerticalAlignment(TextVAlignment::TOP);
+        _labelPlaceHolder->enableWrap(true);
     }
     else {
         _label->enableWrap(false);
         _label->setPosition(Vec2((float)CC_EDIT_BOX_PADDING, size.height));
         _label->setVerticalAlignment(TextVAlignment::CENTER);
 
-        _labelPlaceHolder->setPosition(Vec2((float)CC_EDIT_BOX_PADDING,
-                                            (size.height + placeholderSize.height) / 2));
+        _labelPlaceHolder->enableWrap(false);
+        _labelPlaceHolder->setPosition(Vec2((float)CC_EDIT_BOX_PADDING, (size.height + placeholderSize.height) / 2));
         _labelPlaceHolder->setVerticalAlignment(TextVAlignment::CENTER);
     }
 }
@@ -153,6 +153,12 @@ void EditBoxImplCommon::setInactiveText(const char* pText)
     if(labelSize.width > maxSize.width || labelSize.height > maxSize.height)
     {
         _label->setDimensions(maxSize.width, maxSize.height);
+    }
+
+    Size labelPlaceHolderSize = _labelPlaceHolder->getContentSize();
+    if (labelPlaceHolderSize.width > maxSize.width || labelPlaceHolderSize.height > maxSize.height)
+    {
+        _labelPlaceHolder->setDimensions(maxSize.width, maxSize.height);
     }
 }
 
@@ -270,6 +276,7 @@ void EditBoxImplCommon::setPlaceHolder(const char* pText)
         _placeHolder = pText;
         this->setNativePlaceHolder(pText);
         _labelPlaceHolder->setString(_placeHolder);
+        refreshInactiveText();
     }
 }
 

@@ -155,7 +155,8 @@ float Text::getFontSize()const
 
 void Text::setFontName(const std::string& name)
 {
-    std::string fontName = name.empty() ? "default.ttf" : name;
+    std::string fontName = name.empty() ? CC_DEFAULT_FONT : name;
+
     if(FileUtils::getInstance()->isFileExist(fontName))
     {
         TTFConfig config = _labelRenderer->getTTFConfig();

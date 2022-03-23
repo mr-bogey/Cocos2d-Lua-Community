@@ -148,7 +148,7 @@ bool RichElementText::init(int tag, const Color3B &color, uint8_t opacity, const
     if (RichElement::init(tag, color, opacity))
     {
         _text = text;
-        _fontName = fontName.empty() ? "default.ttf" : fontName;
+        _fontName = fontName.empty() ? CC_DEFAULT_FONT : fontName;
         _fontSize = fontSize;
         _flags = flags;
         _url = url;
@@ -546,7 +546,7 @@ std::string MyXMLVisitor::getFace() const
         if (i->face.size() != 0)
             return i->face;
     }
-    return "";
+    return "fonts/Marker Felt.ttf";
 }
 
 std::string MyXMLVisitor::getURL() const

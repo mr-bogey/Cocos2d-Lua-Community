@@ -126,7 +126,7 @@ public class Cocos2dxEditBox extends EditText {
 
     private int mInputFlagConstraints; 
     private int mInputModeConstraints;
-    private  int mMaxLength;
+    private int mMaxLength;
 
     public Boolean getChangedTextProgrammatically() {
         return changedTextProgrammatically;
@@ -176,14 +176,15 @@ public class Cocos2dxEditBox extends EditText {
     }
 
     public void setMultilineEnabled(boolean flag){
-        this.mInputModeConstraints |= InputType.TYPE_TEXT_FLAG_MULTI_LINE;
+        if (flag){
+            this.mInputModeConstraints |= InputType.TYPE_TEXT_FLAG_MULTI_LINE;
+        } else {
+            this.mInputFlagConstraints ^= InputType.TYPE_TEXT_FLAG_MULTI_LINE;
+        }
     }
 
     public void setReturnType(int returnType) {
         switch (returnType) {
-            case kKeyboardReturnTypeDefault:
-                this.setImeOptions(EditorInfo.IME_ACTION_NONE | EditorInfo.IME_FLAG_NO_EXTRACT_UI);
-                break;
             case kKeyboardReturnTypeDone:
                 this.setImeOptions(EditorInfo.IME_ACTION_DONE | EditorInfo.IME_FLAG_NO_EXTRACT_UI);
                 break;
@@ -208,9 +209,6 @@ public class Cocos2dxEditBox extends EditText {
     public void setTextHorizontalAlignment(int alignment) {
         int gravity = this.getGravity();
         switch (alignment) {
-            case kTextHorizontalAlignmentLeft:
-                gravity = (gravity & ~Gravity.RIGHT) | Gravity.LEFT ;
-                break;
             case kTextHorizontalAlignmentCenter:
                 gravity =(gravity & ~Gravity.RIGHT & ~Gravity.LEFT) | Gravity.CENTER_HORIZONTAL;
                 break;
@@ -232,12 +230,7 @@ public class Cocos2dxEditBox extends EditText {
                 setPadding(padding, padding*3/4, 0, 0);
                 gravity = (gravity & ~Gravity.BOTTOM) | Gravity.TOP ;
                 break;
-            case kTextVerticalAlignmentCenter:
-                setPadding(padding, 0, 0, padding/2);
-                gravity =(gravity & ~Gravity.TOP & ~Gravity.BOTTOM) | Gravity.CENTER_VERTICAL;
-                break;
             case kTextVerticalAlignmentBottom:
-                //TODO: Add appropriate padding when this alignment is used
                 gravity = (gravity & ~Gravity.TOP) | Gravity.BOTTOM ;
                 break;
             default:
@@ -285,15 +278,13 @@ public class Cocos2dxEditBox extends EditText {
 
     @Override
     public boolean onKeyDown(final int pKeyCode, final KeyEvent pKeyEvent) {
-        switch (pKeyCode) {
-            case KeyEvent.KEYCODE_BACK:
-                Cocos2dxActivity activity = (Cocos2dxActivity)this.getContext();
-                //To prevent program from going to background
-                activity.getGLSurfaceView().requestFocus();
-                return true;
-            default:
-                return super.onKeyDown(pKeyCode, pKeyEvent);
+        if (pKeyCode == KeyEvent.KEYCODE_BACK) {
+            Cocos2dxActivity activity = (Cocos2dxActivity) this.getContext();
+            //To prevent program from going to background
+            activity.getGLSurfaceView().requestFocus();
+            return true;
         }
+        return super.onKeyDown(pKeyCode, pKeyEvent);
     }
 
     @Override

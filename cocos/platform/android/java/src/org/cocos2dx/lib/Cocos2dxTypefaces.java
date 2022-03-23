@@ -39,7 +39,7 @@ public class Cocos2dxTypefaces {
     // Fields
     // ===========================================================
 
-    private static final HashMap<String, Typeface> sTypefaceCache = new HashMap<String, Typeface>();
+    private static final HashMap<String, Typeface> sTypefaceCache = new HashMap<>();
 
     // ===========================================================
     // Constructors
@@ -59,7 +59,7 @@ public class Cocos2dxTypefaces {
 
     public static synchronized Typeface get(final Context context, final String assetName) {
         if (!Cocos2dxTypefaces.sTypefaceCache.containsKey(assetName)) {
-            Typeface typeface = null;
+            Typeface typeface;
             if (assetName.startsWith("/"))
             {
                 typeface = Typeface.createFromFile(assetName);

@@ -53,13 +53,10 @@ public class ResizeLayout extends FrameLayout {
             * When the editBox is lose focus or when user begin to type, the do layout is disabled.
             */
             final Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    //Do something after 100ms
-                    requestLayout();
-                    invalidate();
-                }
+            handler.postDelayed(() -> {
+                //Do something after 100ms
+                requestLayout();
+                invalidate();
             }, 1000 / 24);
 
         }

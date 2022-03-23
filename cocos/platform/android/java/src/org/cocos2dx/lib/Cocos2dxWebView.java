@@ -38,8 +38,8 @@ import java.net.URI;
 import java.util.concurrent.CountDownLatch;
 
 class ShouldStartLoadingWorker implements Runnable {
-    private CountDownLatch mLatch;
-    private boolean[] mResult;
+    private final CountDownLatch mLatch;
+    private final boolean[] mResult;
     private final int mViewTag;
     private final String mUrlString;
 
@@ -60,7 +60,7 @@ class ShouldStartLoadingWorker implements Runnable {
 public class Cocos2dxWebView extends WebView {
     private static final String TAG = Cocos2dxWebViewHelper.class.getSimpleName();
 
-    private int mViewTag;
+    private final int mViewTag;
     private String mJSScheme;
 
     public Cocos2dxWebView(Context context) {
@@ -83,7 +83,7 @@ public class Cocos2dxWebView extends WebView {
 
         // `searchBoxJavaBridge_` has big security risk. http://jvn.jp/en/jp/JVN53768697
         try {
-            Method method = this.getClass().getMethod("removeJavascriptInterface", new Class[]{String.class});
+            Method method = this.getClass().getMethod("removeJavascriptInterface", String.class);
             method.invoke(this, "searchBoxJavaBridge_");
         } catch (Exception e) {
             Log.d(TAG, "This API level do not support `removeJavascriptInterface`");
@@ -109,12 +109,7 @@ public class Cocos2dxWebView extends WebView {
             try {
                 URI uri = URI.create(urlString);
                 if (uri != null && uri.getScheme().equals(mJSScheme)) {
-                    activity.runOnGLThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Cocos2dxWebViewHelper._onJsCallback(mViewTag, urlString);
-                        }
-                    });
+                    activity.runOnGLThread(() -> Cocos2dxWebViewHelper._onJsCallback(mViewTag, urlString));
                     return true;
                 }
             } catch (Exception e) {
@@ -141,24 +136,14 @@ public class Cocos2dxWebView extends WebView {
         public void onPageFinished(WebView view, final String url) {
             super.onPageFinished(view, url);
             Cocos2dxActivity activity = (Cocos2dxActivity)getContext();
-            activity.runOnGLThread(new Runnable() {
-                @Override
-                public void run() {
-                    Cocos2dxWebViewHelper._didFinishLoading(mViewTag, url);
-                }
-            });
+            activity.runOnGLThread(() -> Cocos2dxWebViewHelper._didFinishLoading(mViewTag, url));
         }
 
         @Override
         public void onReceivedError(WebView view, int errorCode, String description, final String failingUrl) {
             super.onReceivedError(view, errorCode, description, failingUrl);
             Cocos2dxActivity activity = (Cocos2dxActivity)getContext();
-            activity.runOnGLThread(new Runnable() {
-                @Override
-                public void run() {
-                    Cocos2dxWebViewHelper._didFailLoading(mViewTag, failingUrl);
-                }
-            });
+            activity.runOnGLThread(() -> Cocos2dxWebViewHelper._didFailLoading(mViewTag, failingUrl));
         }
     }
 

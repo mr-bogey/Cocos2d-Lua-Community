@@ -55,9 +55,7 @@ public class GameControllerUtils {
             is.read(buffer);
             is.close();
 
-            String jsonstr = new String(buffer, "UTF-8");
-
-            return jsonstr;
+            return new String(buffer, "UTF-8");
         } catch (Exception e) {
             e.printStackTrace();
         }

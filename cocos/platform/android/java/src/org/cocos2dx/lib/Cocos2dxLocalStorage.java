@@ -24,6 +24,7 @@ THE SOFTWARE.
 ****************************************************************************/
 package org.cocos2dx.lib;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -41,11 +42,7 @@ public class Cocos2dxLocalStorage {
     
     private static DBOpenHelper mDatabaseOpenHelper = null;
     private static SQLiteDatabase mDatabase = null;
-    /**
-     * Constructor
-     * @param context The Context within which to work, used to create the DB
-     * @return 
-     */
+
     public static boolean init(String dbName, String tableName) {
         if (Cocos2dxActivity.getContext() != null) {
             DATABASE_NAME = dbName;
@@ -71,22 +68,22 @@ public class Cocos2dxLocalStorage {
             e.printStackTrace();
         }
     }
-    
+
     public static String getItem(String key) {
         String ret = null;
         try {
-        String sql = "select value from "+TABLE_NAME+" where key=?";
-        Cursor c = mDatabase.rawQuery(sql, new String[]{key});  
-        while (c.moveToNext()) {
-            // only return the first value
-            if (ret != null) 
-            {
-                Log.e(TAG, "The key contains more than one value.");
-                break;
+            String sql = "select value from "+TABLE_NAME+" where key=?";
+            Cursor c = mDatabase.rawQuery(sql, new String[]{key});
+            while (c.moveToNext()) {
+                // only return the first value
+                if (ret != null)
+                {
+                    Log.e(TAG, "The key contains more than one value.");
+                    break;
+                }
+                ret = c.getString(c.getColumnIndex("value"));
             }
-            ret = c.getString(c.getColumnIndex("value"));  
-        }  
-        c.close();
+            c.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -130,8 +127,6 @@ public class Cocos2dxLocalStorage {
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
             Log.w(TAG, "Upgrading database from version " + oldVersion + " to "
                     + newVersion + ", which will destroy all old data");
-            //db.execSQL("DROP TABLE IF EXISTS " + VIRTUAL_TABLE);
-            //onCreate(db);
         }
     }
 }

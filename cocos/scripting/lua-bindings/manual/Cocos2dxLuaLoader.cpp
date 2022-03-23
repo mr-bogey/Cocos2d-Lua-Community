@@ -40,7 +40,7 @@ extern "C"
 #if defined(__aarch64__) || defined(__arm64__)
         static const std::string BYTECODE_FILE_EXT = ".lua64";
 #else
-		static const std::string BYTECODE_FILE_EXT = ".lua32";
+        static const std::string BYTECODE_FILE_EXT = ".lua32";
 #endif
         static const std::string NOT_BYTECODE_FILE_EXT = ".lua";
 

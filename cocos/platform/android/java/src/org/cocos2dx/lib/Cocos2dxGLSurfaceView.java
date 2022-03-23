@@ -24,6 +24,7 @@ THE SOFTWARE.
  ****************************************************************************/
 package org.cocos2dx.lib;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.opengl.GLSurfaceView;
@@ -147,12 +148,7 @@ public class Cocos2dxGLSurfaceView extends GLSurfaceView {
        }
 
        public static void queueAccelerometer(final float x, final float y, final float z, final long timestamp) {   
-       mCocos2dxGLSurfaceView.queueEvent(new Runnable() {
-        @Override
-            public void run() {
-                Cocos2dxAccelerometer.onSensorChanged(x, y, z, timestamp);
-        }
-        });
+       mCocos2dxGLSurfaceView.queueEvent(() -> Cocos2dxAccelerometer.onSensorChanged(x, y, z, timestamp));
     }
 
     public void setCocos2dxRenderer(final Cocos2dxRenderer renderer) {
@@ -184,26 +180,17 @@ public class Cocos2dxGLSurfaceView extends GLSurfaceView {
     public void onResume() {
         super.onResume();
         this.setRenderMode(RENDERMODE_CONTINUOUSLY);
-        this.queueEvent(new Runnable() {
-            @Override
-            public void run() {
-                Cocos2dxGLSurfaceView.this.mCocos2dxRenderer.handleOnResume();
-            }
-        });
+        this.queueEvent(() -> Cocos2dxGLSurfaceView.this.mCocos2dxRenderer.handleOnResume());
     }
 
     @Override
     public void onPause() {
-        this.queueEvent(new Runnable() {
-            @Override
-            public void run() {
-                Cocos2dxGLSurfaceView.this.mCocos2dxRenderer.handleOnPause();
-            }
-        });
+        this.queueEvent(() -> Cocos2dxGLSurfaceView.this.mCocos2dxRenderer.handleOnPause());
         this.setRenderMode(RENDERMODE_WHEN_DIRTY);
         //super.onPause();
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouchEvent(final MotionEvent pMotionEvent) {
         // these data are used in ACTION_MOVE and ACTION_CANCEL
@@ -236,12 +223,7 @@ public class Cocos2dxGLSurfaceView extends GLSurfaceView {
                 final float xPointerDown = pMotionEvent.getX(indexPointerDown);
                 final float yPointerDown = pMotionEvent.getY(indexPointerDown);
 
-                this.queueEvent(new Runnable() {
-                    @Override
-                    public void run() {
-                        Cocos2dxGLSurfaceView.this.mCocos2dxRenderer.handleActionDown(idPointerDown, xPointerDown, yPointerDown);
-                    }
-                });
+                this.queueEvent(() -> Cocos2dxGLSurfaceView.this.mCocos2dxRenderer.handleActionDown(idPointerDown, xPointerDown, yPointerDown));
                 break;
 
             case MotionEvent.ACTION_DOWN:
@@ -250,12 +232,7 @@ public class Cocos2dxGLSurfaceView extends GLSurfaceView {
                 final float xDown = xs[0];
                 final float yDown = ys[0];
 
-                this.queueEvent(new Runnable() {
-                    @Override
-                    public void run() {
-                        Cocos2dxGLSurfaceView.this.mCocos2dxRenderer.handleActionDown(idDown, xDown, yDown);
-                    }
-                });
+                this.queueEvent(() -> Cocos2dxGLSurfaceView.this.mCocos2dxRenderer.handleActionDown(idDown, xDown, yDown));
                 break;
 
             case MotionEvent.ACTION_MOVE:
@@ -266,22 +243,12 @@ public class Cocos2dxGLSurfaceView extends GLSurfaceView {
                             final int[] idsMove = new int[]{0};
                             final float[] xsMove = new float[]{xs[i]};
                             final float[] ysMove = new float[]{ys[i]};
-                            this.queueEvent(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Cocos2dxGLSurfaceView.this.mCocos2dxRenderer.handleActionMove(idsMove, xsMove, ysMove);
-                                }
-                            });
+                            this.queueEvent(() -> Cocos2dxGLSurfaceView.this.mCocos2dxRenderer.handleActionMove(idsMove, xsMove, ysMove));
                             break;
                         }
                     }
                 } else {
-                    this.queueEvent(new Runnable() {
-                        @Override
-                        public void run() {
-                            Cocos2dxGLSurfaceView.this.mCocos2dxRenderer.handleActionMove(ids, xs, ys);
-                        }
-                    });
+                    this.queueEvent(() -> Cocos2dxGLSurfaceView.this.mCocos2dxRenderer.handleActionMove(ids, xs, ys));
                 }
                 break;
 
@@ -294,12 +261,7 @@ public class Cocos2dxGLSurfaceView extends GLSurfaceView {
                 final float xPointerUp = pMotionEvent.getX(indexPointUp);
                 final float yPointerUp = pMotionEvent.getY(indexPointUp);
 
-                this.queueEvent(new Runnable() {
-                    @Override
-                    public void run() {
-                        Cocos2dxGLSurfaceView.this.mCocos2dxRenderer.handleActionUp(idPointerUp, xPointerUp, yPointerUp);
-                    }
-                });
+                this.queueEvent(() -> Cocos2dxGLSurfaceView.this.mCocos2dxRenderer.handleActionUp(idPointerUp, xPointerUp, yPointerUp));
                 break;
 
             case MotionEvent.ACTION_UP:
@@ -308,12 +270,7 @@ public class Cocos2dxGLSurfaceView extends GLSurfaceView {
                 final float xUp = xs[0];
                 final float yUp = ys[0];
 
-                this.queueEvent(new Runnable() {
-                    @Override
-                    public void run() {
-                        Cocos2dxGLSurfaceView.this.mCocos2dxRenderer.handleActionUp(idUp, xUp, yUp);
-                    }
-                });
+                this.queueEvent(() -> Cocos2dxGLSurfaceView.this.mCocos2dxRenderer.handleActionUp(idUp, xUp, yUp));
                 break;
 
             case MotionEvent.ACTION_CANCEL:
@@ -324,31 +281,16 @@ public class Cocos2dxGLSurfaceView extends GLSurfaceView {
                             final int[] idsCancel = new int[]{0};
                             final float[] xsCancel = new float[]{xs[i]};
                             final float[] ysCancel = new float[]{ys[i]};
-                            this.queueEvent(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Cocos2dxGLSurfaceView.this.mCocos2dxRenderer.handleActionCancel(idsCancel, xsCancel, ysCancel);
-                                }
-                            });
+                            this.queueEvent(() -> Cocos2dxGLSurfaceView.this.mCocos2dxRenderer.handleActionCancel(idsCancel, xsCancel, ysCancel));
                             break;
                         }
                     }
                 } else {
-                    this.queueEvent(new Runnable() {
-                        @Override
-                        public void run() {
-                            Cocos2dxGLSurfaceView.this.mCocos2dxRenderer.handleActionCancel(ids, xs, ys);
-                        }
-                    });
+                    this.queueEvent(() -> Cocos2dxGLSurfaceView.this.mCocos2dxRenderer.handleActionCancel(ids, xs, ys));
                 }
                 break;
         }
 
-        /*
-        if (BuildConfig.DEBUG) {
-            Cocos2dxGLSurfaceView.dumpMotionEvent(pMotionEvent);
-        }
-        */
         return true;
     }
 
@@ -376,12 +318,7 @@ public class Cocos2dxGLSurfaceView extends GLSurfaceView {
             case KeyEvent.KEYCODE_ENTER:
             case KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE:
             case KeyEvent.KEYCODE_DPAD_CENTER:
-                this.queueEvent(new Runnable() {
-                    @Override
-                    public void run() {
-                        Cocos2dxGLSurfaceView.this.mCocos2dxRenderer.handleKeyDown(pKeyCode);
-                    }
-                });
+                this.queueEvent(() -> Cocos2dxGLSurfaceView.this.mCocos2dxRenderer.handleKeyDown(pKeyCode));
                 return true;
             default:
                 return super.onKeyDown(pKeyCode, pKeyEvent);
@@ -400,12 +337,7 @@ public class Cocos2dxGLSurfaceView extends GLSurfaceView {
             case KeyEvent.KEYCODE_ENTER:
             case KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE:
             case KeyEvent.KEYCODE_DPAD_CENTER:
-                this.queueEvent(new Runnable() {
-                    @Override
-                    public void run() {
-                        Cocos2dxGLSurfaceView.this.mCocos2dxRenderer.handleKeyUp(keyCode);
-                    }
-                });
+                this.queueEvent(() -> Cocos2dxGLSurfaceView.this.mCocos2dxRenderer.handleKeyUp(keyCode));
                 return true;
             default:
                 return super.onKeyUp(keyCode, event);
@@ -434,25 +366,15 @@ public class Cocos2dxGLSurfaceView extends GLSurfaceView {
     }
 
     public void insertText(final String pText) {
-        this.queueEvent(new Runnable() {
-            @Override
-            public void run() {
-                Cocos2dxGLSurfaceView.this.mCocos2dxRenderer.handleInsertText(pText);
-            }
-        });
+        this.queueEvent(() -> Cocos2dxGLSurfaceView.this.mCocos2dxRenderer.handleInsertText(pText));
     }
 
     public void deleteBackward() {
-        this.queueEvent(new Runnable() {
-            @Override
-            public void run() {
-                Cocos2dxGLSurfaceView.this.mCocos2dxRenderer.handleDeleteBackward();
-            }
-        });
+        this.queueEvent(() -> Cocos2dxGLSurfaceView.this.mCocos2dxRenderer.handleDeleteBackward());
     }
 
     private static void dumpMotionEvent(final MotionEvent event) {
-        final String names[] = { "DOWN", "UP", "MOVE", "CANCEL", "OUTSIDE", "POINTER_DOWN", "POINTER_UP", "7?", "8?", "9?" };
+        final String[] names = { "DOWN", "UP", "MOVE", "CANCEL", "OUTSIDE", "POINTER_DOWN", "POINTER_UP", "7?", "8?", "9?" };
         final StringBuilder sb = new StringBuilder();
         final int action = event.getAction();
         final int actionCode = action & MotionEvent.ACTION_MASK;
@@ -477,8 +399,7 @@ public class Cocos2dxGLSurfaceView extends GLSurfaceView {
 
     /**
      * android 7 和 7.1上main线程初始化GL线程的时候会等待初始化完毕,cocos启动和加载时间，和启动第一个页面时间很容易造成anr
-     * 
-     * @param holder
+     *
      */
     @Override
     public void surfaceRedrawNeeded(SurfaceHolder holder) {
@@ -488,7 +409,7 @@ public class Cocos2dxGLSurfaceView extends GLSurfaceView {
                 this.requestRender();
             } catch (Exception e) {
                 // 如果出错, 就什么都不干了
-            } catch (Error e) {
+            } catch (Error ignored) {
             }
         } else {
             super.surfaceRedrawNeeded(holder);

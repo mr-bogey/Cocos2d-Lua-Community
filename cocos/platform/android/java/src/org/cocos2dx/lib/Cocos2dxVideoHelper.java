@@ -38,9 +38,9 @@ import java.lang.ref.WeakReference;
 
 public class Cocos2dxVideoHelper {
 
-    private FrameLayout mLayout = null;
-    private Cocos2dxActivity mActivity = null;  
-    private SparseArray<Cocos2dxVideoView> sVideoViews = null;
+    private final FrameLayout mLayout;
+    private final Cocos2dxActivity mActivity;
+    private final SparseArray<Cocos2dxVideoView> sVideoViews;
     static VideoHandler mVideoHandler = null;
     
     Cocos2dxVideoHelper(Cocos2dxActivity activity,FrameLayout layout)
@@ -49,7 +49,7 @@ public class Cocos2dxVideoHelper {
         mLayout = layout;
         
         mVideoHandler = new VideoHandler(this);
-        sVideoViews = new SparseArray<Cocos2dxVideoView>();
+        sVideoViews = new SparseArray<>();
     }
     
     private static int videoTag = 0;
@@ -74,7 +74,7 @@ public class Cocos2dxVideoHelper {
         WeakReference<Cocos2dxVideoHelper> mReference;
         
         VideoHandler(Cocos2dxVideoHelper helper){
-            mReference = new WeakReference<Cocos2dxVideoHelper>(helper);
+            mReference = new WeakReference<>(helper);
         }
         
         @Override
@@ -109,11 +109,7 @@ public class Cocos2dxVideoHelper {
             case VideoTaskFullScreen:{
                 Cocos2dxVideoHelper helper = mReference.get();
                 Rect rect = (Rect)msg.obj;
-                if (msg.arg2 == 1) {
-                    helper._setFullScreenEnabled(msg.arg1, true, rect.right, rect.bottom);
-                } else {
-                    helper._setFullScreenEnabled(msg.arg1, false, rect.right, rect.bottom);
-                }
+                helper._setFullScreenEnabled(msg.arg1, msg.arg2 == 1, rect.right, rect.bottom);
                 break;
             }
             case VideoTaskPause: {
@@ -138,11 +134,7 @@ public class Cocos2dxVideoHelper {
             }
             case VideoTaskSetVisible: {
                 Cocos2dxVideoHelper helper = mReference.get();
-                if (msg.arg2 == 1) {
-                    helper._setVideoVisible(msg.arg1, true);
-                } else {
-                    helper._setVideoVisible(msg.arg1, false);
-                }
+                helper._setVideoVisible(msg.arg1, msg.arg2 == 1);
                 break;
             }
             case VideoTaskRestart: {
@@ -152,11 +144,7 @@ public class Cocos2dxVideoHelper {
             }
             case VideoTaskKeepRatio: {
                 Cocos2dxVideoHelper helper = mReference.get();
-                if (msg.arg2 == 1) {
-                    helper._setVideoKeepRatio(msg.arg1, true);
-                } else {
-                    helper._setVideoKeepRatio(msg.arg1, false);
-                }
+                helper._setVideoKeepRatio(msg.arg1, msg.arg2 == 1);
                 break;
             }
             case VideoTaskSetLooping: {
@@ -185,10 +173,10 @@ public class Cocos2dxVideoHelper {
         }
     }
     
-    private class VideoEventRunnable implements Runnable
+    private static class VideoEventRunnable implements Runnable
     {
-        private int mVideoTag;
-        private int mVideoEvent;
+        private final int mVideoTag;
+        private final int mVideoEvent;
         
         public VideoEventRunnable(int tag,int event) {
             mVideoTag = tag;

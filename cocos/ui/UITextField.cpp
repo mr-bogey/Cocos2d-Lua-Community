@@ -458,7 +458,7 @@ int TextField::getFontSize()const
 
 void TextField::setFontName(const std::string& name)
 {
-    std::string fontName = name.empty() ? "default.ttf" : name;
+    std::string fontName = name.empty() ? CC_DEFAULT_FONT : name;
     if(FileUtils::getInstance()->isFileExist(fontName))
     {
         std::string lcName = fontName;

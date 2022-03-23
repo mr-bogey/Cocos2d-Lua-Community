@@ -799,7 +799,8 @@ void Button::setTitleFontName(const std::string& fontName)
 {
     createTitleRendererIfNull();
 
-    std::string name = fontName.empty() ? "default.ttf" : fontName;
+    std::string name = fontName.empty() ? CC_DEFAULT_FONT : fontName;
+
     if(FileUtils::getInstance()->isFileExist(name)) {
         std::string lowerCasedFontName = name;
         std::transform(lowerCasedFontName.begin(), lowerCasedFontName.end(), lowerCasedFontName.begin(), ::tolower);

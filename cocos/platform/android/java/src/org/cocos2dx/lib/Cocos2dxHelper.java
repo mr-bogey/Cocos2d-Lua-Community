@@ -67,6 +67,7 @@ import java.io.FilenameFilter;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
@@ -86,14 +87,16 @@ public class Cocos2dxHelper {
     // Fields
     // ===========================================================
     private static AssetManager sAssetManager;
+    @SuppressLint("StaticFieldLeak")
     private static Cocos2dxAccelerometer sCocos2dxAccelerometer = null;
     private static boolean sAccelerometerEnabled;
     private static boolean sCompassEnabled;
     private static boolean sActivityVisible;
     private static String sPackageName;
+    @SuppressLint("StaticFieldLeak")
     private static Activity sActivity = null;
     private static Cocos2dxHelperListener sCocos2dxHelperListener;
-    private static Set<OnActivityResultListener> onActivityResultListeners = new LinkedHashSet<OnActivityResultListener>();
+    private static final Set<OnActivityResultListener> onActivityResultListeners = new LinkedHashSet<>();
     private static Vibrator sVibrateService = null;
     //Enhance API modification begin
     private static IGameTuningService mGameServiceBinder = null;
@@ -128,29 +131,25 @@ public class Cocos2dxHelper {
             int sampleRate = 44100;
             int bufferSizeInFrames = 192;
 
-            if (Build.VERSION.SDK_INT >= 17) {
-                AudioManager am = (AudioManager) activity.getSystemService(Context.AUDIO_SERVICE);
-                // use reflection to remove dependence of API 17 when compiling
+            AudioManager am = (AudioManager) activity.getSystemService(Context.AUDIO_SERVICE);
+            // use reflection to remove dependence of API 17 when compiling
 
-                // AudioManager.getProperty(AudioManager.PROPERTY_OUTPUT_SAMPLE_RATE);
-                final Class audioManagerClass = AudioManager.class;
-                Object[] parameters = new Object[]{Cocos2dxReflectionHelper.<String>getConstantValue(audioManagerClass, "PROPERTY_OUTPUT_SAMPLE_RATE")};
-                final String strSampleRate = Cocos2dxReflectionHelper.<String>invokeInstanceMethod(am, "getProperty", new Class[]{String.class}, parameters);
+            // AudioManager.getProperty(AudioManager.PROPERTY_OUTPUT_SAMPLE_RATE);
+            final Class<AudioManager> audioManagerClass = AudioManager.class;
+            Object[] parameters = new Object[]{Cocos2dxReflectionHelper.<String>getConstantValue(audioManagerClass, "PROPERTY_OUTPUT_SAMPLE_RATE")};
+            final String strSampleRate = Cocos2dxReflectionHelper.<String>invokeInstanceMethod(am, "getProperty", new Class[]{String.class}, parameters);
 
-                // AudioManager.getProperty(AudioManager.PROPERTY_OUTPUT_FRAMES_PER_BUFFER);
-                parameters = new Object[]{Cocos2dxReflectionHelper.<String>getConstantValue(audioManagerClass, "PROPERTY_OUTPUT_FRAMES_PER_BUFFER")};
-                final String strBufferSizeInFrames = Cocos2dxReflectionHelper.<String>invokeInstanceMethod(am, "getProperty", new Class[]{String.class}, parameters);
+            // AudioManager.getProperty(AudioManager.PROPERTY_OUTPUT_FRAMES_PER_BUFFER);
+            parameters = new Object[]{Cocos2dxReflectionHelper.<String>getConstantValue(audioManagerClass, "PROPERTY_OUTPUT_FRAMES_PER_BUFFER")};
+            final String strBufferSizeInFrames = Cocos2dxReflectionHelper.<String>invokeInstanceMethod(am, "getProperty", new Class[]{String.class}, parameters);
 
-                try {
-                    sampleRate = Integer.parseInt(strSampleRate);
-                    bufferSizeInFrames = Integer.parseInt(strBufferSizeInFrames);
-                } catch (NumberFormatException e) {
-                    Log.e(TAG, "parseInt failed", e);
-                }
-                Log.d(TAG, "sampleRate: " + sampleRate + ", framesPerBuffer: " + bufferSizeInFrames);
-            } else {
-                Log.d(TAG, "android version is lower than 17");
+            try {
+                sampleRate = Integer.parseInt(strSampleRate);
+                bufferSizeInFrames = Integer.parseInt(strBufferSizeInFrames);
+            } catch (NumberFormatException e) {
+                Log.e(TAG, "parseInt failed", e);
             }
+            Log.d(TAG, "sampleRate: " + sampleRate + ", framesPerBuffer: " + bufferSizeInFrames);
 
             nativeSetAudioDeviceInfo(isSupportLowLatency, sampleRate, bufferSizeInFrames);
 
@@ -224,7 +223,7 @@ public class Cocos2dxHelper {
     }
     
     //Enhance API modification begin
-    private static ServiceConnection connection = new ServiceConnection() {
+    private static final ServiceConnection connection = new ServiceConnection() {
         public void onServiceConnected(ComponentName name, IBinder service) {
             mGameServiceBinder = IGameTuningService.Stub.asInterface(service);
             fastLoading(BOOST_TIME);
@@ -318,8 +317,7 @@ public class Cocos2dxHelper {
 
  	public static String getVersion() {
  		try {
- 			String version = Cocos2dxActivity.getContext().getPackageManager().getPackageInfo(Cocos2dxActivity.getContext().getPackageName(), 0).versionName;
- 			return version;
+            return Cocos2dxActivity.getContext().getPackageManager().getPackageInfo(Cocos2dxActivity.getContext().getPackageName(), 0).versionName;
  		} catch(Exception e) {
  			return "";
  		}
@@ -332,7 +330,7 @@ public class Cocos2dxHelper {
             i.setData(Uri.parse(url));
             sActivity.startActivity(i);
             ret = true;
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
         return ret;
     }
@@ -344,15 +342,13 @@ public class Cocos2dxHelper {
             if (descriptor != null) {
                 try {
                     ParcelFileDescriptor parcel = descriptor.getParcelFileDescriptor();
-                    Method method = parcel.getClass().getMethod("getFd", new Class[] {});
+                    Method method = parcel.getClass().getMethod("getFd");
                     array[0] = (Integer)method.invoke(parcel);
                     array[1] = descriptor.getStartOffset();
                     array[2] = descriptor.getLength();
                 } catch (NoSuchMethodException e) {
                     Log.e(Cocos2dxHelper.TAG, "Accessing file descriptor directly from the OBB is only supported from Android 3.1 (API level 12) and above.");
-                } catch (IllegalAccessException e) {
-                    Log.e(Cocos2dxHelper.TAG, e.toString());
-                } catch (InvocationTargetException e) {
+                } catch (IllegalAccessException | InvocationTargetException e) {
                     Log.e(Cocos2dxHelper.TAG, e.toString());
                 }
             }
@@ -379,9 +375,7 @@ public class Cocos2dxHelper {
     
     public static void terminateProcess() {
         // Remove it from recent apps.
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            sActivity.finishAndRemoveTask();
-        }
+        sActivity.finishAndRemoveTask();
         android.os.Process.killProcess(android.os.Process.myPid());
     }
 
@@ -391,18 +385,9 @@ public class Cocos2dxHelper {
 
 
     public static void setEditTextDialogResult(final String pResult) {
-        try {
-            final byte[] bytesUTF8 = pResult.getBytes("UTF8");
+        final byte[] bytesUTF8 = pResult.getBytes(StandardCharsets.UTF_8);
 
-            Cocos2dxHelper.sCocos2dxHelperListener.runOnGLThread(new Runnable() {
-                @Override
-                public void run() {
-                    Cocos2dxHelper.nativeSetEditTextDialogResult(bytesUTF8);
-                }
-            });
-        } catch (UnsupportedEncodingException pUnsupportedEncodingException) {
-            /* Nothing. */
-        }
+        Cocos2dxHelper.sCocos2dxHelperListener.runOnGLThread(() -> Cocos2dxHelper.nativeSetEditTextDialogResult(bytesUTF8));
     }
 
     public static int getDPI()
@@ -436,7 +421,7 @@ public class Cocos2dxHelper {
         catch (Exception ex) {
             ex.printStackTrace();
 
-            Map allValues = settings.getAll();
+            Map<String, ?> allValues = settings.getAll();
             Object value = allValues.get(key);
             if ( value instanceof String)
             {
@@ -444,12 +429,12 @@ public class Cocos2dxHelper {
             }
             else if (value instanceof Integer)
             {
-                int intValue = ((Integer) value).intValue();
+                int intValue = (Integer) value;
                 return (intValue !=  0) ;
             }
             else if (value instanceof Float)
             {
-                float floatValue = ((Float) value).floatValue();
+                float floatValue = (Float) value;
                 return (floatValue != 0.0f);
             }
         }
@@ -465,7 +450,7 @@ public class Cocos2dxHelper {
         catch (Exception ex) {
             ex.printStackTrace();
 
-            Map allValues = settings.getAll();
+            Map<String, ?> allValues = settings.getAll();
             Object value = allValues.get(key);
             if ( value instanceof String) {
                 return  Integer.parseInt(value.toString());
@@ -476,7 +461,7 @@ public class Cocos2dxHelper {
             }
             else if (value instanceof Boolean)
             {
-                boolean booleanValue = ((Boolean) value).booleanValue();
+                boolean booleanValue = (Boolean) value;
                 if (booleanValue)
                     return 1;
             }
@@ -493,7 +478,7 @@ public class Cocos2dxHelper {
         catch (Exception ex) {
             ex.printStackTrace();
 
-            Map allValues = settings.getAll();
+            Map<String, ?> allValues = settings.getAll();
             Object value = allValues.get(key);
             if ( value instanceof String) {
                 return  Float.parseFloat(value.toString());
@@ -504,7 +489,7 @@ public class Cocos2dxHelper {
             }
             else if (value instanceof Boolean)
             {
-                boolean booleanValue = ((Boolean) value).booleanValue();
+                boolean booleanValue = (Boolean) value;
                 if (booleanValue)
                     return 1.0f;
             }
@@ -663,13 +648,7 @@ public class Cocos2dxHelper {
      * @return true if the screen is rounded, false otherwise
      */
     public static boolean isScreenRound() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (sActivity.getResources().getConfiguration().isScreenRound()) {
-                return true;
-            }
-        }
-
-        return false;
+        return sActivity.getResources().getConfiguration().isScreenRound();
     }
 
     /**
@@ -723,30 +702,24 @@ public class Cocos2dxHelper {
      * otherwise <code>false</code> will returned.
      */
     public static boolean hasSoftKeys() {
-        boolean hasSoftwareKeys = true;
+        boolean hasSoftwareKeys;
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            Display display = sActivity.getWindowManager().getDefaultDisplay();
+        Display display = sActivity.getWindowManager().getDefaultDisplay();
 
-            DisplayMetrics realDisplayMetrics = new DisplayMetrics();
-            display.getRealMetrics(realDisplayMetrics);
+        DisplayMetrics realDisplayMetrics = new DisplayMetrics();
+        display.getRealMetrics(realDisplayMetrics);
 
-            int realHeight = realDisplayMetrics.heightPixels;
-            int realWidth = realDisplayMetrics.widthPixels;
+        int realHeight = realDisplayMetrics.heightPixels;
+        int realWidth = realDisplayMetrics.widthPixels;
 
-            DisplayMetrics displayMetrics = new DisplayMetrics();
-            display.getMetrics(displayMetrics);
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        display.getMetrics(displayMetrics);
 
-            int displayHeight = displayMetrics.heightPixels;
-            int displayWidth = displayMetrics.widthPixels;
+        int displayHeight = displayMetrics.heightPixels;
+        int displayWidth = displayMetrics.widthPixels;
 
-            hasSoftwareKeys = (realWidth - displayWidth) > 0 ||
-                    (realHeight - displayHeight) > 0;
-        } else {
-            boolean hasMenuKey = ViewConfiguration.get(sActivity).hasPermanentMenuKey();
-            boolean hasBackKey = KeyCharacterMap.deviceHasKey(KeyEvent.KEYCODE_BACK);
-            hasSoftwareKeys = !hasMenuKey && !hasBackKey;
-        }
+        hasSoftwareKeys = (realWidth - displayWidth) > 0 ||
+                (realHeight - displayHeight) > 0;
         return hasSoftwareKeys;
     }
 

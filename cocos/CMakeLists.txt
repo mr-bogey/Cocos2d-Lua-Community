@@ -52,6 +52,7 @@ option(BUILD_EDITOR_COCOSTUDIO "Build editor support for cocostudio" ON)
 option(BUILD_EDITOR_SPINE "Build editor support for spine" OFF)
 option(BUILD_EDITOR_DRAGONBONES "Build editor support for dragonBones" OFF)
 option(BUILD_EDITOR_FAIRYGUI "Build editor support for fairygui" OFF)
+option(BUILD_EXTENSIONS "Build extension library" OFF)
 
 if(BUILD_EDITOR_COCOSTUDIO)
     include(editor-support/cocostudio/CMakeLists.txt)
@@ -73,6 +74,9 @@ if(BUILD_EDITOR_FAIRYGUI)
     set(COCOS_EDITOR_SUPPORT_SRC ${COCOS_EDITOR_SUPPORT_SRC} ${FAIRYGUI_SRC} ${FAIRYGUI_HEADER})
 endif(BUILD_EDITOR_FAIRYGUI)
 
+if(BUILD_EXTENSIONS)
+    include(../extensions/CMakeLists.txt)
+endif(BUILD_EXTENSIONS)
 
 set(COCOS_HEADER cocos2d.h
     ${COCOS_2D_HEADER}

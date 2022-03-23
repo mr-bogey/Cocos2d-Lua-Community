@@ -31,7 +31,7 @@ public class GameControllerAdapter {
     
     public static void addRunnableToFrameStartList(Runnable runnable) {
         if (sRunnableFrameStartList == null)
-            sRunnableFrameStartList = new ArrayList<Runnable>();
+            sRunnableFrameStartList = new ArrayList<>();
         sRunnableFrameStartList.add(runnable);
     }
 
@@ -52,46 +52,22 @@ public class GameControllerAdapter {
     
     public static void onConnected(final String vendorName, final int controller)
     {
-        Cocos2dxHelper.runOnGLThread(new Runnable() {
-
-            @Override
-            public void run() {
-                nativeControllerConnected(vendorName, controller);
-            }   
-        });
+        Cocos2dxHelper.runOnGLThread(() -> nativeControllerConnected(vendorName, controller));
     }
     
     public static void onDisconnected(final String vendorName, final int controller)
     {
-        Cocos2dxHelper.runOnGLThread(new Runnable() {
-
-            @Override
-            public void run() {
-                nativeControllerDisconnected(vendorName, controller);
-            }   
-        });
+        Cocos2dxHelper.runOnGLThread(() -> nativeControllerDisconnected(vendorName, controller));
     }
     
     public static void onButtonEvent(final String vendorName, final int controller, final int button, final boolean isPressed, final float value, final boolean isAnalog)
     {
-        Cocos2dxHelper.runOnGLThread(new Runnable() {
-
-            @Override
-            public void run() {
-                nativeControllerButtonEvent(vendorName, controller, button, isPressed, value, isAnalog);
-            }   
-        });
+        Cocos2dxHelper.runOnGLThread(() -> nativeControllerButtonEvent(vendorName, controller, button, isPressed, value, isAnalog));
     }
     
     public static void onAxisEvent(final String vendorName, final int controller, final int axisID, final float value, final boolean isAnalog)
     {
-        Cocos2dxHelper.runOnGLThread(new Runnable() {
-
-            @Override
-            public void run() {
-                nativeControllerAxisEvent(vendorName, controller, axisID, value, isAnalog);
-            }   
-        });
+        Cocos2dxHelper.runOnGLThread(() -> nativeControllerAxisEvent(vendorName, controller, axisID, value, isAnalog));
     }
     
     private static native void nativeControllerConnected(final String vendorName, final int controller);

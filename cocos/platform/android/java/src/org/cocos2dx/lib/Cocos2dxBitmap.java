@@ -25,6 +25,7 @@ THE SOFTWARE.
  ****************************************************************************/
 package org.cocos2dx.lib;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -59,6 +60,7 @@ public final class Cocos2dxBitmap {
     // Fields
     // ===========================================================
 
+    @SuppressLint("StaticFieldLeak")
     private static Context sContext;
 
     // ===========================================================
@@ -189,9 +191,9 @@ public final class Cocos2dxBitmap {
             maxWidth = (int)Math.ceil( StaticLayout.getDesiredWidth(string, paint));
         }
 
-        Layout layout = null;
-        int layoutWidth = 0;
-        int layoutHeight = 0;
+        Layout layout;
+        int layoutWidth;
+        int layoutHeight;
 
 
         if (overflow == 1 && !enableWrap){

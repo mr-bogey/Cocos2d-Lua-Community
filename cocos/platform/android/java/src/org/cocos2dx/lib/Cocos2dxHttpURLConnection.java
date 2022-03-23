@@ -178,18 +178,18 @@ public class Cocos2dxHttpURLConnection
             return null;
         }
 
-        String header = "";
+        StringBuilder header = new StringBuilder();
 
         for (Entry<String, List<String>> entry: headers.entrySet()) {
             String key = entry.getKey();
             if (null == key) {
-                header += listToString(entry.getValue(), ",") + "\n";
+                header.append(listToString(entry.getValue(), ",")).append("\n");
             } else {
-                header += key + ":" + listToString(entry.getValue(), ",") + "\n";
+                header.append(key).append(":").append(listToString(entry.getValue(), ",")).append("\n");
             }
         }
 
-        return header;
+        return header.toString();
     }
 
     static String getResponseHeaderByIdx(HttpURLConnection http, int idx) {
@@ -281,9 +281,9 @@ public class Cocos2dxHttpURLConnection
             {
                 bytestream.write(buffer, 0, size);
             }
-            byte retbuffer[] = bytestream.toByteArray();
+            byte[] retBuffer = bytestream.toByteArray();
             bytestream.close();
-            return retbuffer;
+            return retBuffer;
         } catch (Exception e) {
             Log.e("URLConnection exception", e.toString());
         }
@@ -357,8 +357,6 @@ public class Cocos2dxHttpURLConnection
                     secure = item[1];
                 } else if("domain".equalsIgnoreCase(item[0].trim())) {
                     domain = item[1];
-                } else if("version".equalsIgnoreCase(item[0].trim()) || "max-age".equalsIgnoreCase(item[0].trim())) {
-                    //do nothing
                 } else {
                     key = item[0];
                     value = item[1];

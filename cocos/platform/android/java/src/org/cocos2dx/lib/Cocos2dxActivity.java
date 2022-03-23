@@ -79,12 +79,7 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
     
     public void setKeepScreenOn(boolean value) {
         final boolean newValue = value;
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                mGLSurfaceView.setKeepScreenOn(newValue);
-            }
-        });
+        runOnUiThread(() -> mGLSurfaceView.setKeepScreenOn(newValue));
     }
 
     public void setEnableVirtualButton(boolean value) {
@@ -239,23 +234,23 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
     public void init() {
         
         // FrameLayout
-        ViewGroup.LayoutParams frame_layout_params =
+        ViewGroup.LayoutParams framelayout_params =
             new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                                        ViewGroup.LayoutParams.MATCH_PARENT);
 
         mFrameLayout = new ResizeLayout(this);
 
-        mFrameLayout.setLayoutParams(frame_layout_params);
+        mFrameLayout.setLayoutParams(framelayout_params);
 
         // Cocos2dxEditText layout
-        ViewGroup.LayoutParams edit_text_layout_params =
+        ViewGroup.LayoutParams edittext_layout_params =
             new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                                        ViewGroup.LayoutParams.WRAP_CONTENT);
-        Cocos2dxEditBox edit_text = new Cocos2dxEditBox(this);
-        edit_text.setLayoutParams(edit_text_layout_params);
+        Cocos2dxEditBox edittext = new Cocos2dxEditBox(this);
+        edittext.setLayoutParams(edittext_layout_params);
 
 
-        mFrameLayout.addView(edit_text);
+        mFrameLayout.addView(edittext);
 
         // Cocos2dxGLSurfaceView
         this.mGLSurfaceView = this.onCreateView();
@@ -263,13 +258,8 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
         // ...add to FrameLayout
         mFrameLayout.addView(this.mGLSurfaceView);
 
-        // Switch to supported OpenGL (ARGB888) mode on emulator
-        // this line dows not needed on new emulators and also it breaks stencil buffer
-        //if (isAndroidEmulator())
-        //   this.mGLSurfaceView.setEGLConfigChooser(8, 8, 8, 8, 16, 0);
-
         this.mGLSurfaceView.setCocos2dxRenderer(new Cocos2dxRenderer());
-        this.mGLSurfaceView.setCocos2dxEditText(edit_text);
+        this.mGLSurfaceView.setCocos2dxEditText(edittext);
 
         // Set framelayout as the content view
         setContentView(mFrameLayout);
@@ -277,10 +267,6 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
     
     public Cocos2dxGLSurfaceView onCreateView() {
         Cocos2dxGLSurfaceView glSurfaceView = new Cocos2dxGLSurfaceView(this);
-        //this line is need on some device if we specify an alpha bits
-        // FIXME: is it needed? And it will cause afterimage.
-        // if(this.mGLContextAttrs[3] > 0) glSurfaceView.getHolder().setFormat(PixelFormat.TRANSLUCENT);
-
         // use custom EGLConfigureChooser
         Cocos2dxEGLConfigChooser chooser = new Cocos2dxEGLConfigChooser(this.mGLContextAttrs);
         glSurfaceView.setEGLConfigChooser(chooser);
@@ -292,6 +278,8 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
         if (showVirtualButton) {
             return;
         }
+
+        // use reflection to remove dependence of API level
 
         Class<View> viewClass = View.class;
 
@@ -319,19 +307,6 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
         }
     }
 
-    private static boolean isAndroidEmulator() {
-        String model = Build.MODEL;
-        Log.d(TAG, "model=" + model);
-        String product = Build.PRODUCT;
-        Log.d(TAG, "product=" + product);
-        boolean isEmulator = false;
-        if (product != null) {
-            isEmulator = product.equals("sdk") || product.contains("_sdk") || product.contains("sdk_");
-        }
-        Log.d(TAG, "isEmulator=" + isEmulator);
-        return isEmulator;
-   }
-
     private static boolean isDeviceLocked() {
         KeyguardManager keyguardManager = (KeyguardManager)getContext().getSystemService(Context.KEYGUARD_SERVICE);
         return keyguardManager.inKeyguardRestrictedInputMode();
@@ -349,15 +324,10 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
     // Inner and Anonymous Classes
     // ===========================================================
 
-    private class Cocos2dxEGLConfigChooser implements GLSurfaceView.EGLConfigChooser
+    private static class Cocos2dxEGLConfigChooser implements GLSurfaceView.EGLConfigChooser
     {
-        private int[] mConfigAttributes;
-        private  final int EGL_OPENGL_ES2_BIT = 0x04;
-        private  final int EGL_OPENGL_ES3_BIT = 0x40;
-        public Cocos2dxEGLConfigChooser(int redSize, int greenSize, int blueSize, int alphaSize, int depthSize, int stencilSize, int multisamplingCount)
-        {
-            mConfigAttributes = new int[] {redSize, greenSize, blueSize, alphaSize, depthSize, stencilSize, multisamplingCount};
-        }
+        private final int[] mConfigAttributes;
+
         public Cocos2dxEGLConfigChooser(int[] attributes)
         {
             mConfigAttributes = attributes;
@@ -366,6 +336,7 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
         @Override
         public EGLConfig chooseConfig(EGL10 egl, EGLDisplay display)
         {
+            int EGL_OPENGL_ES2_BIT = 0x04;
             int[][] EGLAttributes = {
                 {
                     // GL ES 2 with user set

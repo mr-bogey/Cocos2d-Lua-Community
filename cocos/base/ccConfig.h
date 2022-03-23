@@ -258,7 +258,7 @@ THE SOFTWARE.
 #if (CC_USE_PHYSICS)
 /** Use chipmunk physics 2d engine. */
 #ifndef CC_ENABLE_CHIPMUNK_INTEGRATION
-#define CC_ENABLE_CHIPMUNK_INTEGRATION 0
+#define CC_ENABLE_CHIPMUNK_INTEGRATION 1
 #endif
 
 /** or use box2d physics 2d engine. */
@@ -270,7 +270,7 @@ THE SOFTWARE.
 /** Use 3d physics integration API. */
 #ifndef CC_USE_3D_PHYSICS
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS || CC_TARGET_PLATFORM == CC_PLATFORM_MAC || CC_TARGET_PLATFORM == CC_PLATFORM_WIN32 || CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_LINUX)
-#define CC_USE_3D_PHYSICS 0
+#define CC_USE_3D_PHYSICS 1
 #endif
 #endif
 
@@ -283,12 +283,12 @@ THE SOFTWARE.
 
 /** Use 3D navigation API */
 #ifndef CC_USE_NAVMESH
-#define CC_USE_NAVMESH 0
+#define CC_USE_NAVMESH 1
 #endif
 
 /** Use culling or not. */
 #ifndef CC_USE_CULLING
-#define CC_USE_CULLING 0
+#define CC_USE_CULLING 1
 #endif
 
 /** Support PNG or not. If your application don't use png format picture, you can undefine this macro to save package size.
@@ -300,13 +300,13 @@ THE SOFTWARE.
 /** Support JPEG or not. If your application don't use jpeg format picture, you can undefine this macro to save package size.
  */
 #ifndef CC_USE_JPEG
-#define CC_USE_JPEG  0
+#define CC_USE_JPEG  1
 #endif // CC_USE_JPEG
 
 /** Support webp or not. If your application don't use webp format picture, you can undefine this macro to save package size.
  */
 #ifndef CC_USE_WEBP
-#define CC_USE_WEBP  0
+#define CC_USE_WEBP  1
 #endif // CC_USE_WEBP
 
 /** Enable Script binding. */
@@ -356,4 +356,8 @@ THE SOFTWARE.
  */
 #ifndef CC_STRIP_FPS
 #define CC_STRIP_FPS 0
+#endif
+
+#ifndef CC_DEFAULT_FONT
+#define CC_DEFAULT_FONT "default.ttf"
 #endif
