@@ -240,6 +240,11 @@ void TimerScriptHandler::cancel()
 
 }
 
+float TimerScriptHandler::getRemainTime()
+{
+    return _interval - _elapsed;
+}
+
 #endif
 
 // implementation of Scheduler
@@ -677,6 +682,20 @@ void Scheduler::unscheduleScriptEntry(unsigned int scheduleScriptEntryID)
             break;
         }
     }
+}
+
+float Scheduler::getRemainTime(unsigned int scheduleScriptEntryID)
+{
+    for (ssize_t i = _scriptHandlerEntries.size() - 1; i >= 0; i--)
+    {
+        SchedulerScriptHandlerEntry* entry = _scriptHandlerEntries.at(i);
+        if (entry->getEntryId() == (int)scheduleScriptEntryID)
+        {
+            TimerScriptHandler* timer = entry->getTimer();
+            return timer->getRemainTime();
+        }
+    }
+    return 0.0f;
 }
 
 #endif

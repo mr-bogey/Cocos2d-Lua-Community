@@ -307,6 +307,54 @@ tolua_lerror:
 #endif
 }
 
+
+static int tolua_cocos2d_Scheduler_getRemainTime(lua_State* tolua_S)
+{
+    if (NULL == tolua_S)
+        return 0;
+
+    int argc = 0;
+    Scheduler* self = nullptr;
+
+#if COCOS2D_DEBUG >= 1
+    tolua_Error tolua_err;
+    if (!tolua_isusertype(tolua_S, 1, "cc.Scheduler", 0, &tolua_err)) goto tolua_lerror;
+#endif
+
+    self = static_cast<cocos2d::Scheduler*>(tolua_tousertype(tolua_S, 1, 0));
+
+#if COCOS2D_DEBUG >= 1
+    if (nullptr == self) {
+        tolua_error(tolua_S, "invalid 'self' in function 'tolua_cocos2d_Scheduler_getRemainTime'\n", NULL);
+        return 0;
+    }
+#endif
+
+    argc = lua_gettop(tolua_S) - 1;
+    if (1 == argc) {
+#if COCOS2D_DEBUG >= 1
+        if (!tolua_isnumber(tolua_S, 2, 0, &tolua_err))
+        {
+            goto tolua_lerror;
+        }
+#endif
+
+        unsigned int scheduleScriptEntryID = ((unsigned int)tolua_tonumber(tolua_S, 2, 0));
+        float tolua_ret = self->getRemainTime(scheduleScriptEntryID);
+        tolua_pushnumber(tolua_S, (lua_Number)tolua_ret);
+        return 1;
+    }
+
+    luaL_error(tolua_S, "%s has wrong number of arguments: %d, was expecting %d\n", "cc.Scheduler:unscheduleScriptEntry", argc, 1);
+    return 0;
+
+#if COCOS2D_DEBUG >= 1
+    tolua_lerror:
+    tolua_error(tolua_S, "#ferror in function 'tolua_cocos2d_Scheduler_unscheduleScriptEntry'.", &tolua_err);
+    return 0;
+#endif
+}
+
 static int tolua_cocos2d_RenderTexture_newImage(lua_State* tolua_S)
 {
     int argc = 0;
@@ -2494,9 +2542,12 @@ static void extendScheduler(lua_State* tolua_S)
     {
         lua_pushstring(tolua_S,"scheduleScriptFunc");
         lua_pushcfunction(tolua_S,tolua_cocos2d_Scheduler_scheduleScriptFunc);
-        lua_rawset(tolua_S,-3);
+        lua_rawset(tolua_S,-3); 
         lua_pushstring(tolua_S, "unscheduleScriptEntry");
         lua_pushcfunction(tolua_S,tolua_cocos2d_Scheduler_unscheduleScriptEntry);
+        lua_rawset(tolua_S, -3);
+        lua_pushstring(tolua_S, "getRemainTime");
+        lua_pushcfunction(tolua_S,tolua_cocos2d_Scheduler_getRemainTime);
         lua_rawset(tolua_S, -3);
     }
     lua_pop(tolua_S, 1);

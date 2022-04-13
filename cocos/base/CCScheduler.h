@@ -124,6 +124,7 @@ public:
     
     virtual void trigger(float dt) override;
     virtual void cancel() override;
+    float getRemainTime();
     
 private:
     int _scriptHandler;
@@ -352,6 +353,7 @@ public:
      * @lua NA
      */
     void unscheduleScriptEntry(unsigned int scheduleScriptEntryID);
+    float getRemainTime(unsigned int scheduleScriptEntryID);
 #endif
     
     /////////////////////////////////////
