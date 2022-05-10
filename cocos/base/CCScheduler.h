@@ -354,6 +354,7 @@ public:
      */
     void unscheduleScriptEntry(unsigned int scheduleScriptEntryID);
     float getRemainTime(unsigned int scheduleScriptEntryID);
+    bool isVaildHandle(unsigned int scheduleScriptEntryID);
 #endif
     
     /////////////////////////////////////

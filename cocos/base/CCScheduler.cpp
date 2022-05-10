@@ -698,6 +698,19 @@ float Scheduler::getRemainTime(unsigned int scheduleScriptEntryID)
     return 0.0f;
 }
 
+bool Scheduler::isVaildHandle(unsigned int scheduleScriptEntryID)
+{
+    for (ssize_t i = _scriptHandlerEntries.size() - 1; i >= 0; i--)
+    {
+        SchedulerScriptHandlerEntry* entry = _scriptHandlerEntries.at(i);
+        if (entry->getEntryId() == (int)scheduleScriptEntryID)
+        {
+            return !entry->isMarkedForDeletion();
+        }
+    }
+    return false;
+}
+
 #endif
 
 void Scheduler::resumeTarget(void *target)
