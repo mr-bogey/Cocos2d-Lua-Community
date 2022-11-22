@@ -456,6 +456,14 @@ void EditBox::setFont(const char* pFontName, int fontSize)
     }
 }
 
+void EditBox::setFontPath(const std::string& fontName)
+{
+    if (_editBoxImpl != nullptr)
+    {
+        _editBoxImpl->setFontPath(fontName);
+    }
+}
+
 void EditBox::setFontName(const char* pFontName)
 {
     CCASSERT(pFontName != nullptr, "fontName can't be nullptr");
@@ -521,6 +529,14 @@ void EditBox::setPlaceholderFont(const char* pFontName, int fontSize)
         {
             _editBoxImpl->setPlaceholderFont(pFontName, fontSize);
         }
+    }
+}
+
+void EditBox::setPlaceholderFontPath(const std::string& fontName)
+{
+    if (_editBoxImpl != nullptr)
+    {
+        _editBoxImpl->setPlaceholderFontPath(fontName);
     }
 }
 

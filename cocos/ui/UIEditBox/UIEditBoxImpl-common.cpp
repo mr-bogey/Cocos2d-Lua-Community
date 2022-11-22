@@ -177,6 +177,24 @@ void EditBoxImplCommon::setFont(const char* pFontName, int fontSize)
     }
 }
 
+void EditBoxImplCommon::setFontPath(const std::string& fontName)
+{
+    std::string name = fontName.empty() ? CC_DEFAULT_FONT : fontName;
+    if (FileUtils::getInstance()->isFileExist(name)) {
+        std::string lowerCasedFontName = name;
+        std::transform(lowerCasedFontName.begin(), lowerCasedFontName.end(), lowerCasedFontName.begin(), ::tolower);
+        if (lowerCasedFontName.find(".fnt") != std::string::npos) {
+            _label->setBMFontFilePath(name);
+        }
+        else {
+            TTFConfig config = _label->getTTFConfig();
+            config.fontFilePath = name;
+            config.fontSize = _label->getRenderingFontSize();
+            _label->setTTFConfig(config);
+        }
+    }
+}
+
 void EditBoxImplCommon::setFontColor(const Color4B& color)
 {
     _colText = color;
@@ -196,6 +214,24 @@ void EditBoxImplCommon::setPlaceholderFont(const char* pFontName, int fontSize)
     if (fontSize > 0)
     {
         _labelPlaceHolder->setSystemFontSize(fontSize);
+    }
+}
+
+void EditBoxImplCommon::setPlaceholderFontPath(const std::string& fontName)
+{
+    std::string name = fontName.empty() ? CC_DEFAULT_FONT : fontName;
+    if (FileUtils::getInstance()->isFileExist(name)) {
+        std::string lowerCasedFontName = name;
+        std::transform(lowerCasedFontName.begin(), lowerCasedFontName.end(), lowerCasedFontName.begin(), ::tolower);
+        if (lowerCasedFontName.find(".fnt") != std::string::npos) {
+            _labelPlaceHolder->setBMFontFilePath(name);
+        }
+        else {
+            TTFConfig config = _labelPlaceHolder->getTTFConfig();
+            config.fontFilePath = name;
+            config.fontSize = _labelPlaceHolder->getRenderingFontSize();
+            _labelPlaceHolder->setTTFConfig(config);
+        }
     }
 }
 

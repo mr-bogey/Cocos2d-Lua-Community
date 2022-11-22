@@ -108,6 +108,8 @@ namespace cocostudio
             }else if(key == P_FontName){
                 editBox->setFontName(value.c_str());
                 editBox->setPlaceholderFontName(value.c_str());
+                editBox->setFontPath(value.c_str());
+                editBox->setPlaceholderFontPath(value.c_str());
             }else if(key == P_MaxLength){
                 editBox->setMaxLength(valueToInt(value));
             }else if(key == P_PasswordEnable){
@@ -306,6 +308,8 @@ namespace cocostudio
         std::string fontName = options->fontName()->c_str();
         editBox->setFontName(fontName.c_str());
         editBox->setPlaceholderFontName(fontName.c_str());
+        editBox->setFontPath(fontName);
+        editBox->setPlaceholderFontPath(fontName);
         
         bool maxLengthEnabled = options->maxLengthEnabled();
         int maxLength = options->maxLength();

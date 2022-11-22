@@ -48,8 +48,10 @@ namespace cocos2d {
             
             virtual bool initWithSize(const Size& size) = 0;
             virtual void setFont(const char* pFontName, int fontSize) = 0;
+            virtual void setFontPath(const std::string& fontName) = 0;
             virtual void setFontColor(const Color4B& color) = 0;
             virtual void setPlaceholderFont(const char* pFontName, int fontSize) = 0;
+            virtual void setPlaceholderFontPath(const std::string& fontName) = 0;
             virtual void setPlaceholderFontColor(const Color4B& color) = 0;
             virtual void setInputMode(EditBox::InputMode inputMode) = 0;
             virtual void setInputFlag(EditBox::InputFlag inputFlag) = 0;
