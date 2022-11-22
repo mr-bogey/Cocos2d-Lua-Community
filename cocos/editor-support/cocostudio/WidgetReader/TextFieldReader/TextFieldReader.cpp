@@ -106,8 +106,6 @@ namespace cocostudio
                 editBox->setFontSize(valueToInt(value));
                 editBox->setPlaceholderFontSize(valueToInt(value));
             }else if(key == P_FontName){
-                editBox->setFontName(value.c_str());
-                editBox->setPlaceholderFontName(value.c_str());
                 editBox->setFontPath(value.c_str());
                 editBox->setPlaceholderFontPath(value.c_str());
             }else if(key == P_MaxLength){
@@ -306,8 +304,6 @@ namespace cocostudio
         editBox->setPlaceholderFontSize(fontSize);
         
         std::string fontName = options->fontName()->c_str();
-        editBox->setFontName(fontName.c_str());
-        editBox->setPlaceholderFontName(fontName.c_str());
         editBox->setFontPath(fontName);
         editBox->setPlaceholderFontPath(fontName);
         
