@@ -22,9 +22,11 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    buildToolsVersion PROP_BUILD_TOOLS_VERSION
     ndkVersion PROP_NDK_VERSION
 }
 
 dependencies {
     implementation fileTree(dir: '../java/libs', include: ['*.jar'])
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
 }
