@@ -29,7 +29,6 @@ if(ANDROID)
         platform/android/CCCommon-android.cpp
         platform/android/CCGLViewImpl-android.cpp
         platform/android/CCFileUtils-android.cpp
-        platform/android/CCEnhanceAPI-android.cpp
         platform/android/CCNetwork-Android.cpp
     )
 elseif(WINDOWS)

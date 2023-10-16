@@ -1,26 +1,26 @@
 /****************************************************************************
-Copyright (c) 2010-2013 cocos2d-x.org
-Copyright (c) 2017-2018 Xiamen Yaji Software Co., Ltd.
+ Copyright (c) 2010-2013 cocos2d-x.org
+ Copyright (c) 2017-2018 Xiamen Yaji Software Co., Ltd.
 
-http://www.cocos2d-x.org
+ http://www.cocos2d-x.org
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
+ The above copyright notice and this permission notice shall be included in
+ all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ THE SOFTWARE.
  ****************************************************************************/
 package org.cocos2dx.lib;
 
@@ -58,10 +58,10 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
     // ===========================================================
     // Fields
     // ===========================================================
-    
+
     private Cocos2dxGLSurfaceView mGLSurfaceView = null;
     private int[] mGLContextAttrs = null;
-    private Cocos2dxHandler mHandler = null;   
+    private Cocos2dxHandler mHandler = null;
     private static Cocos2dxActivity sContext = null;
     private Cocos2dxVideoHelper mVideoHelper = null;
     private Cocos2dxWebViewHelper mWebViewHelper = null;
@@ -69,14 +69,14 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
     private boolean hasFocus = false;
     private boolean showVirtualButton = false;
 
-    public Cocos2dxGLSurfaceView getGLSurfaceView(){
-        return  mGLSurfaceView;
+    public Cocos2dxGLSurfaceView getGLSurfaceView() {
+        return mGLSurfaceView;
     }
 
     public static Context getContext() {
         return sContext;
     }
-    
+
     public void setKeepScreenOn(boolean value) {
         final boolean newValue = value;
         runOnUiThread(() -> mGLSurfaceView.setKeepScreenOn(newValue));
@@ -96,7 +96,7 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
             e.printStackTrace();
         }
     }
-    
+
     // ===========================================================
     // Constructors
     // ===========================================================
@@ -117,31 +117,31 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
 
         this.hideVirtualButton();
 
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-			WindowManager.LayoutParams lp = getWindow().getAttributes();
-			lp.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES;
-			getWindow().setAttributes(lp);
-		}
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            WindowManager.LayoutParams lp = getWindow().getAttributes();
+            lp.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES;
+            getWindow().setAttributes(lp);
+        }
 
         onLoadNativeLibraries();
 
         sContext = this;
         this.mHandler = new Cocos2dxHandler(this);
-        
+
         Cocos2dxHelper.init(this);
-        
+
         this.mGLContextAttrs = getGLContextAttrs();
         this.init();
 
         if (mVideoHelper == null) {
             mVideoHelper = new Cocos2dxVideoHelper(this, mFrameLayout);
         }
-        
-        if(mWebViewHelper == null){
+
+        if (mWebViewHelper == null) {
             mWebViewHelper = new Cocos2dxWebViewHelper(mFrameLayout);
         }
 
-        if(mEditBoxHelper == null){
+        if (mEditBoxHelper == null) {
             mEditBoxHelper = new Cocos2dxEditBoxHelper(mFrameLayout);
         }
 
@@ -163,41 +163,41 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
 
     @Override
     protected void onResume() {
-    	Log.d(TAG, "onResume()");
+        Log.d(TAG, "onResume()");
         super.onResume();
         this.hideVirtualButton();
-       	resumeIfHasFocus();
+        resumeIfHasFocus();
     }
-    
+
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
-    	Log.d(TAG, "onWindowFocusChanged() hasFocus=" + hasFocus);
+        Log.d(TAG, "onWindowFocusChanged() hasFocus=" + hasFocus);
         super.onWindowFocusChanged(hasFocus);
-        
+
         this.hasFocus = hasFocus;
         resumeIfHasFocus();
     }
-    
+
     private void resumeIfHasFocus() {
         //It is possible for the app to receive the onWindowsFocusChanged(true) event
         //even though it is locked or asleep
         boolean readyToPlay = !isDeviceLocked() && !isDeviceAsleep();
 
-        if(hasFocus && readyToPlay) {
+        if (hasFocus && readyToPlay) {
             this.hideVirtualButton();
-        	Cocos2dxHelper.onResume();
-        	mGLSurfaceView.onResume();
+            Cocos2dxHelper.onResume();
+            mGLSurfaceView.onResume();
         }
     }
 
     @Override
     protected void onPause() {
-    	Log.d(TAG, "onPause()");
+        Log.d(TAG, "onPause()");
         super.onPause();
         Cocos2dxHelper.onPause();
         mGLSurfaceView.onPause();
     }
-    
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -210,15 +210,14 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
         msg.obj = new Cocos2dxHandler.DialogMessage(pTitle, pMessage);
         this.mHandler.sendMessage(msg);
     }
-    
+
     @Override
     public void runOnGLThread(final Runnable pRunnable) {
         this.mGLSurfaceView.queueEvent(pRunnable);
     }
-    
+
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data)
-    {
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         for (OnActivityResultListener listener : Cocos2dxHelper.getOnActivityResultListeners()) {
             listener.onActivityResult(requestCode, resultCode, data);
         }
@@ -228,15 +227,16 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
 
 
     protected ResizeLayout mFrameLayout = null;
+
     // ===========================================================
     // Methods
     // ===========================================================
     public void init() {
-        
+
         // FrameLayout
         ViewGroup.LayoutParams framelayout_params =
-            new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                                       ViewGroup.LayoutParams.MATCH_PARENT);
+                new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.MATCH_PARENT);
 
         mFrameLayout = new ResizeLayout(this);
 
@@ -244,8 +244,8 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
 
         // Cocos2dxEditText layout
         ViewGroup.LayoutParams edittext_layout_params =
-            new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                                       ViewGroup.LayoutParams.WRAP_CONTENT);
+                new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT);
         Cocos2dxEditBox edittext = new Cocos2dxEditBox(this);
         edittext.setLayoutParams(edittext_layout_params);
 
@@ -264,7 +264,7 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
         // Set framelayout as the content view
         setContentView(mFrameLayout);
     }
-    
+
     public Cocos2dxGLSurfaceView onCreateView() {
         Cocos2dxGLSurfaceView glSurfaceView = new Cocos2dxGLSurfaceView(this);
         // use custom EGLConfigureChooser
@@ -308,13 +308,13 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
     }
 
     private static boolean isDeviceLocked() {
-        KeyguardManager keyguardManager = (KeyguardManager)getContext().getSystemService(Context.KEYGUARD_SERVICE);
+        KeyguardManager keyguardManager = (KeyguardManager) getContext().getSystemService(Context.KEYGUARD_SERVICE);
         return keyguardManager.inKeyguardRestrictedInputMode();
     }
 
     private static boolean isDeviceAsleep() {
-        PowerManager powerManager = (PowerManager)getContext().getSystemService(Context.POWER_SERVICE);
-        if(powerManager == null) {
+        PowerManager powerManager = (PowerManager) getContext().getSystemService(Context.POWER_SERVICE);
+        if (powerManager == null) {
             return false;
         }
         return !powerManager.isInteractive();
@@ -324,64 +324,61 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
     // Inner and Anonymous Classes
     // ===========================================================
 
-    private static class Cocos2dxEGLConfigChooser implements GLSurfaceView.EGLConfigChooser
-    {
+    private static class Cocos2dxEGLConfigChooser implements GLSurfaceView.EGLConfigChooser {
         private final int[] mConfigAttributes;
 
-        public Cocos2dxEGLConfigChooser(int[] attributes)
-        {
+        public Cocos2dxEGLConfigChooser(int[] attributes) {
             mConfigAttributes = attributes;
         }
 
         @Override
-        public EGLConfig chooseConfig(EGL10 egl, EGLDisplay display)
-        {
+        public EGLConfig chooseConfig(EGL10 egl, EGLDisplay display) {
             int EGL_OPENGL_ES2_BIT = 0x04;
             int[][] EGLAttributes = {
-                {
-                    // GL ES 2 with user set
-                    EGL10.EGL_RED_SIZE, mConfigAttributes[0],
-                    EGL10.EGL_GREEN_SIZE, mConfigAttributes[1],
-                    EGL10.EGL_BLUE_SIZE, mConfigAttributes[2],
-                    EGL10.EGL_ALPHA_SIZE, mConfigAttributes[3],
-                    EGL10.EGL_DEPTH_SIZE, mConfigAttributes[4],
-                    EGL10.EGL_STENCIL_SIZE, mConfigAttributes[5],
-                    EGL10.EGL_SAMPLE_BUFFERS, (mConfigAttributes[6] > 0) ? 1 : 0,
-                    EGL10.EGL_SAMPLES, mConfigAttributes[6],
-                    EGL10.EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
-                    EGL10.EGL_NONE
-                },
-                {
-                     // GL ES 2 with user set 16 bit depth buffer
-                     EGL10.EGL_RED_SIZE, mConfigAttributes[0],
-                     EGL10.EGL_GREEN_SIZE, mConfigAttributes[1],
-                     EGL10.EGL_BLUE_SIZE, mConfigAttributes[2],
-                     EGL10.EGL_ALPHA_SIZE, mConfigAttributes[3],
-                     EGL10.EGL_DEPTH_SIZE, mConfigAttributes[4] >= 24 ? 16 : mConfigAttributes[4],
-                     EGL10.EGL_STENCIL_SIZE, mConfigAttributes[5],
-                     EGL10.EGL_SAMPLE_BUFFERS, (mConfigAttributes[6] > 0) ? 1 : 0,
-                     EGL10.EGL_SAMPLES, mConfigAttributes[6],
-                     EGL10.EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
-                     EGL10.EGL_NONE
-                },
-                {
-                     // GL ES 2 with user set 16 bit depth buffer without multisampling
-                     EGL10.EGL_RED_SIZE, mConfigAttributes[0],
-                     EGL10.EGL_GREEN_SIZE, mConfigAttributes[1],
-                     EGL10.EGL_BLUE_SIZE, mConfigAttributes[2],
-                     EGL10.EGL_ALPHA_SIZE, mConfigAttributes[3],
-                     EGL10.EGL_DEPTH_SIZE, mConfigAttributes[4] >= 24 ? 16 : mConfigAttributes[4],
-                     EGL10.EGL_STENCIL_SIZE, mConfigAttributes[5],
-                     EGL10.EGL_SAMPLE_BUFFERS, 0,
-                     EGL10.EGL_SAMPLES, 0,
-                     EGL10.EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
-                     EGL10.EGL_NONE
-                },
-                {
-                    // GL ES 2 by default
-                    EGL10.EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
-                    EGL10.EGL_NONE
-                }
+                    {
+                            // GL ES 2 with user set
+                            EGL10.EGL_RED_SIZE, mConfigAttributes[0],
+                            EGL10.EGL_GREEN_SIZE, mConfigAttributes[1],
+                            EGL10.EGL_BLUE_SIZE, mConfigAttributes[2],
+                            EGL10.EGL_ALPHA_SIZE, mConfigAttributes[3],
+                            EGL10.EGL_DEPTH_SIZE, mConfigAttributes[4],
+                            EGL10.EGL_STENCIL_SIZE, mConfigAttributes[5],
+                            EGL10.EGL_SAMPLE_BUFFERS, (mConfigAttributes[6] > 0) ? 1 : 0,
+                            EGL10.EGL_SAMPLES, mConfigAttributes[6],
+                            EGL10.EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
+                            EGL10.EGL_NONE
+                    },
+                    {
+                            // GL ES 2 with user set 16 bit depth buffer
+                            EGL10.EGL_RED_SIZE, mConfigAttributes[0],
+                            EGL10.EGL_GREEN_SIZE, mConfigAttributes[1],
+                            EGL10.EGL_BLUE_SIZE, mConfigAttributes[2],
+                            EGL10.EGL_ALPHA_SIZE, mConfigAttributes[3],
+                            EGL10.EGL_DEPTH_SIZE, mConfigAttributes[4] >= 24 ? 16 : mConfigAttributes[4],
+                            EGL10.EGL_STENCIL_SIZE, mConfigAttributes[5],
+                            EGL10.EGL_SAMPLE_BUFFERS, (mConfigAttributes[6] > 0) ? 1 : 0,
+                            EGL10.EGL_SAMPLES, mConfigAttributes[6],
+                            EGL10.EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
+                            EGL10.EGL_NONE
+                    },
+                    {
+                            // GL ES 2 with user set 16 bit depth buffer without multisampling
+                            EGL10.EGL_RED_SIZE, mConfigAttributes[0],
+                            EGL10.EGL_GREEN_SIZE, mConfigAttributes[1],
+                            EGL10.EGL_BLUE_SIZE, mConfigAttributes[2],
+                            EGL10.EGL_ALPHA_SIZE, mConfigAttributes[3],
+                            EGL10.EGL_DEPTH_SIZE, mConfigAttributes[4] >= 24 ? 16 : mConfigAttributes[4],
+                            EGL10.EGL_STENCIL_SIZE, mConfigAttributes[5],
+                            EGL10.EGL_SAMPLE_BUFFERS, 0,
+                            EGL10.EGL_SAMPLES, 0,
+                            EGL10.EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
+                            EGL10.EGL_NONE
+                    },
+                    {
+                            // GL ES 2 by default
+                            EGL10.EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
+                            EGL10.EGL_NONE
+                    }
             };
 
             EGLConfig result;
