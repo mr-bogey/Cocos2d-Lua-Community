@@ -3,8 +3,9 @@ plugins {
 }
 
 android {
-    namespace = "org.cocos2dx"
+    namespace = "org.cocos2dx.lib"
     compileSdk = 34
+    ndkVersion = "21.4.7075529"
 
     defaultConfig {
         minSdk = 24
@@ -18,8 +19,8 @@ android {
     }
 
     sourceSets.getByName("main") {
-        java.setSrcDirs(listOf("/src"))
-        manifest.srcFile("AndroidManifest.xml")
+        java.setSrcDirs(listOf("../java/src"))
+        manifest.srcFile("../java/AndroidManifest.xml")
     }
 }
 
