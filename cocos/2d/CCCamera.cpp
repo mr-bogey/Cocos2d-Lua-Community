@@ -1,6 +1,7 @@
 /****************************************************************************
  Copyright (c) 2014-2016 Chukong Technologies Inc.
  Copyright (c) 2017-2019 Xiamen Yaji Software Co., Ltd.
+ Copyright (c) 2023 cocos2d-lua.org
  
  http://www.cocos2d-x.org
  
@@ -26,7 +27,6 @@
 
  ****************************************************************************/
 #include "2d/CCCamera.h"
-#include "2d/CCCameraBackgroundBrush.h"
 #include "base/CCDirector.h"
 #include "platform/CCGLView.h"
 #include "2d/CCScene.h"
@@ -45,7 +45,6 @@ Camera* Camera::create()
     Camera* camera = new (std::nothrow) Camera();
     camera->initDefault();
     camera->autorelease();
-    camera->setDepth(0);
     
     return camera;
 }
@@ -105,13 +104,10 @@ const Camera* Camera::getVisitingCamera()
 
 Camera::Camera()
 {
-    // minggo comment
-    // _frustum.setClipZ(true);
 }
 
 Camera::~Camera()
 {
-    CC_SAFE_RELEASE(_clearBrush);
 }
 
 const Mat4& Camera::getProjectionMatrix() const
@@ -125,7 +121,6 @@ const Mat4& Camera::getViewMatrix() const
     if (memcmp(viewInv.m, _viewInv.m, count) != 0)
     {
         _viewProjectionDirty = true;
-        _frustumDirty = true;
         _viewInv = viewInv;
         _view = viewInv.getInversed();
     }
@@ -223,7 +218,6 @@ bool Camera::initPerspective(float fieldOfView, float aspectRatio, float nearPla
     _farPlane = farPlane;
     Mat4::createPerspective(_fieldOfView, _aspectRatio, _nearPlane, _farPlane, &_projection);
     _viewProjectionDirty = true;
-    _frustumDirty = true;
     _type = Type::PERSPECTIVE;
     
     return true;
@@ -237,7 +231,6 @@ bool Camera::initOrthographic(float zoomX, float zoomY, float nearPlane, float f
     _farPlane = farPlane;
     Mat4::createOrthographicOffCenter(0, _zoom[0], 0, _zoom[1], _nearPlane, _farPlane, &_projection);
     _viewProjectionDirty = true;
-    _frustumDirty = true;
     _type = Type::ORTHOGRAPHIC;
     
     return true;
@@ -331,35 +324,12 @@ void Camera::unprojectGL(const Size& viewport, const Vec3* src, Vec3* dst) const
     dst->set(screen.x, screen.y, screen.z);
 }
 
- bool Camera::isVisibleInFrustum(const AABB* aabb) const
- {
-     if (_frustumDirty)
-     {
-         _frustum.initFrustum(this);
-         _frustumDirty = false;
-     }
-     return !_frustum.isOutOfFrustum(*aabb);
- }
-
 float Camera::getDepthInView(const Mat4& transform) const
 {
     Mat4 camWorldMat = getNodeToWorldTransform();
     const Mat4 &viewMat = camWorldMat.getInversed();
     float depth = -(viewMat.m[2] * transform.m[12] + viewMat.m[6] * transform.m[13] + viewMat.m[10] * transform.m[14] + viewMat.m[14]);
     return depth;
-}
-
-void Camera::setDepth(int8_t depth)
-{
-    if (_depth != depth)
-    {
-        _depth = depth;
-        if (_scene)
-        {
-            //notify scene that the camera order is dirty
-            _scene->setCameraOrderDirty();
-        }
-    }
 }
 
 void Camera::onEnter()
@@ -380,6 +350,19 @@ void Camera::onExit()
     // remove this camera from scene
     setScene(nullptr);
     Node::onExit();
+}
+
+void Camera::setTag(int tag)
+{
+    if (_tag != tag)
+    {
+        _tag = tag;
+        if (_scene)
+        {
+            //notify scene that the camera order is dirty
+            _scene->setCameraOrderDirty();
+        }
+    }
 }
 
 void Camera::setScene(Scene* scene)
@@ -411,14 +394,6 @@ void Camera::setScene(Scene* scene)
     }
 }
 
-void Camera::clearBackground()
-{
-    if (_clearBrush)
-    {
-        _clearBrush->drawBackground(this);
-    }
-}
-
 void Camera::apply()
 {
     _viewProjectionUpdated = _transformUpdated;
@@ -430,30 +405,10 @@ void Camera::applyViewport()
     Director::getInstance()->getRenderer()->setViewPort(_defaultViewport.x, _defaultViewport.y, _defaultViewport.w, _defaultViewport.h);
 }
 
-int Camera::getRenderOrder() const
-{
-    int result(0);
-    result = 127 <<8;
-    result += _depth;
-    return result;
-}
-
 void Camera::visit(Renderer* renderer, const Mat4 &parentTransform, uint32_t parentFlags)
 {
     _viewProjectionUpdated = _transformUpdated;
     return Node::visit(renderer, parentTransform, parentFlags);
-}
-
-void Camera::setBackgroundBrush(CameraBackgroundBrush* clearBrush)
-{
-    CC_SAFE_RETAIN(clearBrush);
-    CC_SAFE_RELEASE(_clearBrush);
-    _clearBrush = clearBrush;
-}
-
-bool Camera::isBrushValid()
-{
-    return _clearBrush != nullptr && _clearBrush->isValid();
 }
 
 NS_CC_END

@@ -29,6 +29,8 @@ import android.content.Context;
 import android.util.Log;
 import android.view.Gravity;
 import android.webkit.WebChromeClient;
+import android.webkit.WebResourceError;
+import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
@@ -103,8 +105,9 @@ public class Cocos2dxWebView extends WebView {
 
     class Cocos2dxWebViewClient extends WebViewClient {
         @Override
-        public boolean shouldOverrideUrlLoading(WebView view, final String urlString) {
+        public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
             Cocos2dxActivity activity = (Cocos2dxActivity)getContext();
+            String urlString = request.getUrl().toString();
 
             try {
                 URI uri = URI.create(urlString);
@@ -140,10 +143,10 @@ public class Cocos2dxWebView extends WebView {
         }
 
         @Override
-        public void onReceivedError(WebView view, int errorCode, String description, final String failingUrl) {
-            super.onReceivedError(view, errorCode, description, failingUrl);
+        public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
+            super.onReceivedError(view, request, error);
             Cocos2dxActivity activity = (Cocos2dxActivity)getContext();
-            activity.runOnGLThread(() -> Cocos2dxWebViewHelper._didFailLoading(mViewTag, failingUrl));
+            activity.runOnGLThread(() -> Cocos2dxWebViewHelper._didFailLoading(mViewTag, request.getUrl().toString()));
         }
     }
 

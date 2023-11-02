@@ -50,7 +50,6 @@ THE SOFTWARE.
 #include "base/CCMap.h"
 #include "base/CCNS.h"
 #include "base/CCProfiling.h"
-#include "base/CCProperties.h"
 #include "base/CCRef.h"
 #include "base/CCRefPtr.h"
 #include "base/CCScheduler.h"
@@ -137,7 +136,6 @@ THE SOFTWARE.
 
 // 2d utils
 #include "2d/CCCamera.h"
-#include "2d/CCCameraBackgroundBrush.h"
 #include "2d/CCGrid.h"
 #include "2d/CCLight.h"
 
@@ -148,14 +146,11 @@ THE SOFTWARE.
 #include "renderer/CCCallbackCommand.h"
 #include "renderer/CCCustomCommand.h"
 #include "renderer/CCGroupCommand.h"
-#include "renderer/CCMaterial.h"
-#include "renderer/CCPass.h"
 #include "renderer/CCQuadCommand.h"
 #include "renderer/CCRenderCommand.h"
 #include "renderer/CCRenderCommandPool.h"
 #include "renderer/CCRenderState.h"
 #include "renderer/CCRenderer.h"
-#include "renderer/CCTechnique.h"
 #include "renderer/CCTexture2D.h"
 #include "renderer/CCTextureCube.h"
 #include "renderer/CCTextureCache.h"
@@ -189,6 +184,9 @@ THE SOFTWARE.
     #include "platform/android/CCGLViewImpl-android.h"
     #include "platform/android/CCGL-android.h"
     #include "platform/android/CCStdC-android.h"
+//Enhance modification begin
+    #include "platform/android/CCEnhanceAPI-android.h"
+//Enhance modification end
 #endif // CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
 
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)
@@ -239,27 +237,6 @@ THE SOFTWARE.
 // component
 #include "2d/CCComponent.h"
 #include "2d/CCComponentContainer.h"
-
-//3d
-#include "3d/CCAABB.h"
-#include "3d/CCAnimate3D.h"
-#include "3d/CCAnimation3D.h"
-#include "3d/CCAttachNode.h"
-#include "3d/CCBillBoard.h"
-#include "3d/CCFrustum.h"
-#include "3d/CCMesh.h"
-#include "3d/CCMeshSkin.h"
-#include "3d/CCMotionStreak3D.h"
-#include "3d/CCMeshVertexIndexData.h"
-#include "3d/CCOBB.h"
-#include "3d/CCPlane.h"
-#include "3d/CCRay.h"
-#include "3d/CCSkeleton3D.h"
-#include "3d/CCSkybox.h"
-#include "3d/CCSprite3D.h"
-#include "3d/CCSprite3DMaterial.h"
-#include "3d/CCTerrain.h"
-#include "3d/CCVertexAttribBinding.h"
 
 NS_CC_BEGIN
 

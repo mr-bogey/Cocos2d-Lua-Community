@@ -39,7 +39,7 @@ public class Cocos2dxTypefaces {
     // Fields
     // ===========================================================
 
-    private static final HashMap<String, Typeface> sTypefaceCache = new HashMap<>();
+    private static final HashMap<String, Typeface> sTypefaceCache = new HashMap<String, Typeface>();
 
     // ===========================================================
     // Constructors

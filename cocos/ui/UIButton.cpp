@@ -31,7 +31,6 @@ THE SOFTWARE.
 #include "platform/CCFileUtils.h"
 #include "ui/UIHelper.h"
 #include <algorithm>
-#include "editor-support/cocostudio/CocosStudioExtension.h"
 
 NS_CC_BEGIN
 
@@ -800,24 +799,22 @@ float Button::getZoomScale()const
 void Button::setTitleFontName(const std::string& fontName)
 {
     createTitleRendererIfNull();
-
-    std::string name = fontName.empty() ? CC_DEFAULT_FONT : fontName;
-
-    if(FileUtils::getInstance()->isFileExist(name)) {
-        std::string lowerCasedFontName = name;
+    
+    if(FileUtils::getInstance()->isFileExist(fontName)) {
+        std::string lowerCasedFontName = fontName;
         std::transform(lowerCasedFontName.begin(), lowerCasedFontName.end(), lowerCasedFontName.begin(), ::tolower);
         if (lowerCasedFontName.find(".fnt") != std::string::npos) {
-            _titleRenderer->setBMFontFilePath(name);
+            _titleRenderer->setBMFontFilePath(fontName);
         } else {
             TTFConfig config = _titleRenderer->getTTFConfig();
-            config.fontFilePath = name;
+            config.fontFilePath = fontName;
             config.fontSize = _titleRenderer->getRenderingFontSize();
             _titleRenderer->setTTFConfig(config);
         }
     } else {
-        _titleRenderer->setSystemFontName(name);
+        _titleRenderer->setSystemFontName(fontName);
     }
-    _fontName = name;
+    _fontName = fontName;
     updateContentSize();
 }
 

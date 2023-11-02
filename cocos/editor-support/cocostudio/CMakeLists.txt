@@ -34,7 +34,6 @@ set(COCOS_CS_HEADER
     editor-support/cocostudio/CCActionFrameEasing.h
     editor-support/cocostudio/CCTween.h
     editor-support/cocostudio/CCActionNode.h
-    editor-support/cocostudio/CSParse3DBinary_generated.h
     editor-support/cocostudio/DictionaryHelper.h
     editor-support/cocostudio/CSParseBinary_generated.h
     editor-support/cocostudio/CCComBase.h
@@ -42,17 +41,13 @@ set(COCOS_CS_HEADER
     editor-support/cocostudio/WidgetReader/ArmatureNodeReader/ArmatureNodeReader.h
     editor-support/cocostudio/WidgetReader/ArmatureNodeReader/CSArmatureNode_generated.h
     editor-support/cocostudio/WidgetReader/ProjectNodeReader/ProjectNodeReader.h
-    editor-support/cocostudio/WidgetReader/GameNode3DReader/GameNode3DReader.h
     editor-support/cocostudio/WidgetReader/ListViewReader/ListViewReader.h
     editor-support/cocostudio/WidgetReader/GameMapReader/GameMapReader.h
-    editor-support/cocostudio/WidgetReader/UserCameraReader/UserCameraReader.h
     editor-support/cocostudio/WidgetReader/LoadingBarReader/LoadingBarReader.h
     editor-support/cocostudio/WidgetReader/SpriteReader/SpriteReader.h
     editor-support/cocostudio/WidgetReader/TextAtlasReader/TextAtlasReader.h
-    editor-support/cocostudio/WidgetReader/Node3DReader/Node3DReader.h
     editor-support/cocostudio/WidgetReader/WidgetReaderProtocol.h
     editor-support/cocostudio/WidgetReader/ButtonReader/ButtonReader.h
-    editor-support/cocostudio/WidgetReader/Light3DReader/Light3DReader.h
     editor-support/cocostudio/WidgetReader/TabControlReader/TabControlReader.h
     editor-support/cocostudio/WidgetReader/TabControlReader/CSTabControl_generated.h
     editor-support/cocostudio/WidgetReader/TextReader/TextReader.h
@@ -65,11 +60,9 @@ set(COCOS_CS_HEADER
     editor-support/cocostudio/WidgetReader/NodeReaderDefine.h
     editor-support/cocostudio/WidgetReader/TextBMFontReader/TextBMFontReader.h
     editor-support/cocostudio/WidgetReader/CheckBoxReader/CheckBoxReader.h
-    editor-support/cocostudio/WidgetReader/Sprite3DReader/Sprite3DReader.h
     editor-support/cocostudio/WidgetReader/SliderReader/SliderReader.h
     editor-support/cocostudio/WidgetReader/ComAudioReader/ComAudioReader.h
     editor-support/cocostudio/WidgetReader/ParticleReader/ParticleReader.h
-#    editor-support/cocostudio/WidgetReader/Particle3DReader/Particle3DReader.h
     editor-support/cocostudio/WidgetReader/SkeletonReader/CSBoneBinary_generated.h
     editor-support/cocostudio/WidgetReader/SkeletonReader/SkeletonNodeReader.h
     editor-support/cocostudio/WidgetReader/SkeletonReader/BoneNodeReader.h
@@ -150,10 +143,6 @@ set(COCOS_CS_SRC
     editor-support/cocostudio/WidgetReader/SliderReader/SliderReader.cpp
     editor-support/cocostudio/WidgetReader/PageViewReader/PageViewReader.cpp
     editor-support/cocostudio/WidgetReader/TextReader/TextReader.cpp
-    editor-support/cocostudio/WidgetReader/Node3DReader/Node3DReader.cpp
-    editor-support/cocostudio/WidgetReader/UserCameraReader/UserCameraReader.cpp
-#    editor-support/cocostudio/WidgetReader/Particle3DReader/Particle3DReader.cpp
-    editor-support/cocostudio/WidgetReader/Sprite3DReader/Sprite3DReader.cpp
     editor-support/cocostudio/WidgetReader/SkeletonReader/BoneNodeReader.cpp
     editor-support/cocostudio/WidgetReader/SkeletonReader/SkeletonNodeReader.cpp
     editor-support/cocostudio/WidgetReader/TextAtlasReader/TextAtlasReader.cpp
@@ -162,8 +151,6 @@ set(COCOS_CS_SRC
     editor-support/cocostudio/WidgetReader/ImageViewReader/ImageViewReader.cpp
     editor-support/cocostudio/WidgetReader/ButtonReader/ButtonReader.cpp
     editor-support/cocostudio/WidgetReader/ScrollViewReader/ScrollViewReader.cpp
-    editor-support/cocostudio/WidgetReader/GameNode3DReader/GameNode3DReader.cpp
-    editor-support/cocostudio/WidgetReader/Light3DReader/Light3DReader.cpp
     editor-support/cocostudio/ActionTimeline/CCActionTimelineCache.cpp
     editor-support/cocostudio/ActionTimeline/CCActionTimeline.cpp
     editor-support/cocostudio/ActionTimeline/CCActionTimelineNode.cpp

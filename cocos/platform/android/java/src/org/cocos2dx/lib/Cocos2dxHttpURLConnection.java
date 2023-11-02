@@ -75,9 +75,9 @@ public class Cocos2dxHttpURLConnection
         return urlConnection;
     }
 
-    static void setReadAndConnectTimeout(HttpURLConnection urlConnection, int readMiliseconds, int connectMiliseconds) {
-        urlConnection.setReadTimeout(readMiliseconds);
-        urlConnection.setConnectTimeout(connectMiliseconds);
+    static void setReadAndConnectTimeout(HttpURLConnection urlConnection, int readMillisecond, int connectMillisecond) {
+        urlConnection.setReadTimeout(readMillisecond);
+        urlConnection.setConnectTimeout(connectMillisecond);
     }
 
     static void setRequestMethod(HttpURLConnection urlConnection, String method){
@@ -100,7 +100,7 @@ public class Cocos2dxHttpURLConnection
         HttpsURLConnection httpsURLConnection = (HttpsURLConnection)urlConnection;
 
         try {
-            InputStream caInput = null;
+            InputStream caInput;
             if (sslFilename.startsWith("/")) {
                 caInput = new BufferedInputStream(new FileInputStream(sslFilename));
             }else {
@@ -275,14 +275,14 @@ public class Cocos2dxHttpURLConnection
 
         try {
             byte[] buffer = new byte[1024];
-            int size   = 0;
-            ByteArrayOutputStream bytestream = new ByteArrayOutputStream();
+            int size;
+            ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
             while((size = in.read(buffer, 0 , 1024)) != -1)
             {
-                bytestream.write(buffer, 0, size);
+                byteStream.write(buffer, 0, size);
             }
-            byte[] retBuffer = bytestream.toByteArray();
-            bytestream.close();
+            byte[] retBuffer = byteStream.toByteArray();
+            byteStream.close();
             return retBuffer;
         } catch (Exception e) {
             Log.e("URLConnection exception", e.toString());
@@ -335,7 +335,7 @@ public class Cocos2dxHttpURLConnection
     public static String combinCookies(List<String> list, String hostDomain) {
         StringBuilder sbCookies = new StringBuilder();
         String domain    = hostDomain;
-        String tailmatch = "FALSE";
+        String tailMatch = "FALSE";
         String path      = "/";
         String secure    = "FALSE";
         String key = null;
@@ -357,6 +357,8 @@ public class Cocos2dxHttpURLConnection
                     secure = item[1];
                 } else if("domain".equalsIgnoreCase(item[0].trim())) {
                     domain = item[1];
+                } else if("version".equalsIgnoreCase(item[0].trim()) || "max-age".equalsIgnoreCase(item[0].trim())) {
+                    //do nothing
                 } else {
                     key = item[0];
                     value = item[1];
@@ -369,7 +371,7 @@ public class Cocos2dxHttpURLConnection
 
             sbCookies.append(domain);
             sbCookies.append('\t');
-            sbCookies.append(tailmatch);  //access
+            sbCookies.append(tailMatch);  //access
             sbCookies.append('\t');
             sbCookies.append(path);      //path
             sbCookies.append('\t');

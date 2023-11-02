@@ -25,5 +25,6 @@ android {
 }
 
 dependencies {
+    implementation(fileTree(mapOf(Pair("include", listOf("*.jar")), Pair("dir", "../java/libs"))))
     implementation(libs.appcompat)
 }

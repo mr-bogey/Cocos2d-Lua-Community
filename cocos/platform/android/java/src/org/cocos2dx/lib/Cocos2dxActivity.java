@@ -32,7 +32,6 @@ import android.content.pm.PackageManager;
 import android.opengl.GLSurfaceView;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Message;
 import android.os.PowerManager;
 import android.preference.PreferenceManager.OnActivityResultListener;
 import android.util.Log;
@@ -62,7 +61,6 @@ public abstract class Cocos2dxActivity extends AppCompatActivity implements Coco
 
     private Cocos2dxGLSurfaceView mGLSurfaceView = null;
     private int[] mGLContextAttrs = null;
-    private Cocos2dxHandler mHandler = null;
     private static Cocos2dxActivity sContext = null;
     private Cocos2dxVideoHelper mVideoHelper = null;
     private Cocos2dxWebViewHelper mWebViewHelper = null;
@@ -92,6 +90,7 @@ public abstract class Cocos2dxActivity extends AppCompatActivity implements Coco
             ApplicationInfo ai = getPackageManager().getApplicationInfo(getPackageName(), PackageManager.GET_META_DATA);
             Bundle bundle = ai.metaData;
             String libName = bundle.getString("android.app.lib_name");
+            assert libName != null;
             System.loadLibrary(libName);
         } catch (Exception e) {
             e.printStackTrace();
@@ -106,13 +105,8 @@ public abstract class Cocos2dxActivity extends AppCompatActivity implements Coco
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Workaround in https://stackoverflow.com/questions/16283079/re-launch-of-activity-on-home-button-but-only-the-first-time/16447508
         if (!isTaskRoot()) {
-            // Android launched another instance of the root activity into an existing task
-            //  so just quietly finish and go away, dropping the user back into the activity
-            //  at the top of the stack (ie: the last state of this task)
             finish();
-            Log.w(TAG, "[Workaround] Ignore the activity started from icon!");
             return;
         }
 
@@ -127,7 +121,6 @@ public abstract class Cocos2dxActivity extends AppCompatActivity implements Coco
         onLoadNativeLibraries();
 
         sContext = this;
-        this.mHandler = new Cocos2dxHandler(this);
 
         Cocos2dxHelper.init(this);
 
@@ -206,10 +199,6 @@ public abstract class Cocos2dxActivity extends AppCompatActivity implements Coco
 
     @Override
     public void showDialog(final String pTitle, final String pMessage) {
-        Message msg = new Message();
-        msg.what = Cocos2dxHandler.HANDLER_SHOW_DIALOG;
-        msg.obj = new Cocos2dxHandler.DialogMessage(pTitle, pMessage);
-        this.mHandler.sendMessage(msg);
     }
 
     @Override
@@ -235,20 +224,16 @@ public abstract class Cocos2dxActivity extends AppCompatActivity implements Coco
     public void init() {
 
         // FrameLayout
-        ViewGroup.LayoutParams framelayout_params =
-                new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.MATCH_PARENT);
+        ViewGroup.LayoutParams frameLayoutParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
 
         mFrameLayout = new ResizeLayout(this);
 
-        mFrameLayout.setLayoutParams(framelayout_params);
+        mFrameLayout.setLayoutParams(frameLayoutParams);
 
         // Cocos2dxEditText layout
-        ViewGroup.LayoutParams edittext_layout_params =
-                new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT);
+        ViewGroup.LayoutParams edittextLayoutParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         Cocos2dxEditBox edittext = new Cocos2dxEditBox(this);
-        edittext.setLayoutParams(edittext_layout_params);
+        edittext.setLayoutParams(edittextLayoutParams);
 
 
         mFrameLayout.addView(edittext);
@@ -259,6 +244,11 @@ public abstract class Cocos2dxActivity extends AppCompatActivity implements Coco
         // ...add to FrameLayout
         mFrameLayout.addView(this.mGLSurfaceView);
 
+        // Switch to supported OpenGL (ARGB888) mode on emulator
+        // this line dows not needed on new emulators and also it breaks stencil buffer
+        //if (isAndroidEmulator())
+        //   this.mGLSurfaceView.setEGLConfigChooser(8, 8, 8, 8, 16, 0);
+
         this.mGLSurfaceView.setCocos2dxRenderer(new Cocos2dxRenderer());
         this.mGLSurfaceView.setCocos2dxEditText(edittext);
 
@@ -268,6 +258,10 @@ public abstract class Cocos2dxActivity extends AppCompatActivity implements Coco
 
     public Cocos2dxGLSurfaceView onCreateView() {
         Cocos2dxGLSurfaceView glSurfaceView = new Cocos2dxGLSurfaceView(this);
+        //this line is need on some device if we specify an alpha bits
+        // FIXME: is it needed? And it will cause afterimage.
+        // if(this.mGLContextAttrs[3] > 0) glSurfaceView.getHolder().setFormat(PixelFormat.TRANSLUCENT);
+
         // use custom EGLConfigureChooser
         Cocos2dxEGLConfigChooser chooser = new Cocos2dxEGLConfigChooser(this.mGLContextAttrs);
         glSurfaceView.setEGLConfigChooser(chooser);
@@ -293,19 +287,26 @@ public abstract class Cocos2dxActivity extends AppCompatActivity implements Coco
             final int SYSTEM_UI_FLAG_LAYOUT_STABLE = Cocos2dxReflectionHelper.<Integer>getConstantValue(viewClass, "SYSTEM_UI_FLAG_LAYOUT_STABLE");
 
             // getWindow().getDecorView().setSystemUiVisibility();
-            final Object[] parameters = new Object[]{SYSTEM_UI_FLAG_LAYOUT_STABLE
-                    | SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                    | SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                    | SYSTEM_UI_FLAG_HIDE_NAVIGATION // hide nav bar
+            final Object[] parameters = new Object[]{SYSTEM_UI_FLAG_LAYOUT_STABLE | SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION | SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | SYSTEM_UI_FLAG_HIDE_NAVIGATION // hide nav bar
                     | SYSTEM_UI_FLAG_FULLSCREEN // hide status bar
                     | SYSTEM_UI_FLAG_IMMERSIVE_STICKY};
-            Cocos2dxReflectionHelper.<Void>invokeInstanceMethod(getWindow().getDecorView(),
-                    "setSystemUiVisibility",
-                    new Class[]{Integer.TYPE},
-                    parameters);
+            Cocos2dxReflectionHelper.<Void>invokeInstanceMethod(getWindow().getDecorView(), "setSystemUiVisibility", new Class[]{Integer.TYPE}, parameters);
         } catch (NullPointerException e) {
             Log.e(TAG, "hideVirtualButton", e);
         }
+    }
+
+    private static boolean isAndroidEmulator() {
+        String model = Build.MODEL;
+        Log.d(TAG, "model=" + model);
+        String product = Build.PRODUCT;
+        Log.d(TAG, "product=" + product);
+        boolean isEmulator = false;
+        if (product != null) {
+            isEmulator = product.equals("sdk") || product.contains("_sdk") || product.contains("sdk_");
+        }
+        Log.d(TAG, "isEmulator=" + isEmulator);
+        return isEmulator;
     }
 
     private static boolean isDeviceLocked() {
@@ -327,6 +328,12 @@ public abstract class Cocos2dxActivity extends AppCompatActivity implements Coco
 
     private static class Cocos2dxEGLConfigChooser implements GLSurfaceView.EGLConfigChooser {
         private final int[] mConfigAttributes;
+        private final int EGL_OPENGL_ES2_BIT = 0x04;
+        private final int EGL_OPENGL_ES3_BIT = 0x40;
+
+        public Cocos2dxEGLConfigChooser(int redSize, int greenSize, int blueSize, int alphaSize, int depthSize, int stencilSize, int multisamplingCount) {
+            mConfigAttributes = new int[]{redSize, greenSize, blueSize, alphaSize, depthSize, stencilSize, multisamplingCount};
+        }
 
         public Cocos2dxEGLConfigChooser(int[] attributes) {
             mConfigAttributes = attributes;
@@ -334,59 +341,20 @@ public abstract class Cocos2dxActivity extends AppCompatActivity implements Coco
 
         @Override
         public EGLConfig chooseConfig(EGL10 egl, EGLDisplay display) {
-            int EGL_OPENGL_ES2_BIT = 0x04;
             int[][] EGLAttributes = {
-                    {
-                            // GL ES 2 with user set
-                            EGL10.EGL_RED_SIZE, mConfigAttributes[0],
-                            EGL10.EGL_GREEN_SIZE, mConfigAttributes[1],
-                            EGL10.EGL_BLUE_SIZE, mConfigAttributes[2],
-                            EGL10.EGL_ALPHA_SIZE, mConfigAttributes[3],
-                            EGL10.EGL_DEPTH_SIZE, mConfigAttributes[4],
-                            EGL10.EGL_STENCIL_SIZE, mConfigAttributes[5],
-                            EGL10.EGL_SAMPLE_BUFFERS, (mConfigAttributes[6] > 0) ? 1 : 0,
-                            EGL10.EGL_SAMPLES, mConfigAttributes[6],
-                            EGL10.EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
-                            EGL10.EGL_NONE
-                    },
-                    {
-                            // GL ES 2 with user set 16 bit depth buffer
-                            EGL10.EGL_RED_SIZE, mConfigAttributes[0],
-                            EGL10.EGL_GREEN_SIZE, mConfigAttributes[1],
-                            EGL10.EGL_BLUE_SIZE, mConfigAttributes[2],
-                            EGL10.EGL_ALPHA_SIZE, mConfigAttributes[3],
-                            EGL10.EGL_DEPTH_SIZE, mConfigAttributes[4] >= 24 ? 16 : mConfigAttributes[4],
-                            EGL10.EGL_STENCIL_SIZE, mConfigAttributes[5],
-                            EGL10.EGL_SAMPLE_BUFFERS, (mConfigAttributes[6] > 0) ? 1 : 0,
-                            EGL10.EGL_SAMPLES, mConfigAttributes[6],
-                            EGL10.EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
-                            EGL10.EGL_NONE
-                    },
-                    {
-                            // GL ES 2 with user set 16 bit depth buffer without multisampling
-                            EGL10.EGL_RED_SIZE, mConfigAttributes[0],
-                            EGL10.EGL_GREEN_SIZE, mConfigAttributes[1],
-                            EGL10.EGL_BLUE_SIZE, mConfigAttributes[2],
-                            EGL10.EGL_ALPHA_SIZE, mConfigAttributes[3],
-                            EGL10.EGL_DEPTH_SIZE, mConfigAttributes[4] >= 24 ? 16 : mConfigAttributes[4],
-                            EGL10.EGL_STENCIL_SIZE, mConfigAttributes[5],
-                            EGL10.EGL_SAMPLE_BUFFERS, 0,
-                            EGL10.EGL_SAMPLES, 0,
-                            EGL10.EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
-                            EGL10.EGL_NONE
-                    },
-                    {
-                            // GL ES 2 by default
-                            EGL10.EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
-                            EGL10.EGL_NONE
-                    }
-            };
+                    // GL ES 2 with user set
+                    {EGL10.EGL_RED_SIZE, mConfigAttributes[0], EGL10.EGL_GREEN_SIZE, mConfigAttributes[1], EGL10.EGL_BLUE_SIZE, mConfigAttributes[2], EGL10.EGL_ALPHA_SIZE, mConfigAttributes[3], EGL10.EGL_DEPTH_SIZE, mConfigAttributes[4], EGL10.EGL_STENCIL_SIZE, mConfigAttributes[5], EGL10.EGL_SAMPLE_BUFFERS, (mConfigAttributes[6] > 0) ? 1 : 0, EGL10.EGL_SAMPLES, mConfigAttributes[6], EGL10.EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT, EGL10.EGL_NONE},
+                    // GL ES 2 with user set 16 bit depth buffer
+                    {EGL10.EGL_RED_SIZE, mConfigAttributes[0], EGL10.EGL_GREEN_SIZE, mConfigAttributes[1], EGL10.EGL_BLUE_SIZE, mConfigAttributes[2], EGL10.EGL_ALPHA_SIZE, mConfigAttributes[3], EGL10.EGL_DEPTH_SIZE, mConfigAttributes[4] >= 24 ? 16 : mConfigAttributes[4], EGL10.EGL_STENCIL_SIZE, mConfigAttributes[5], EGL10.EGL_SAMPLE_BUFFERS, (mConfigAttributes[6] > 0) ? 1 : 0, EGL10.EGL_SAMPLES, mConfigAttributes[6], EGL10.EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT, EGL10.EGL_NONE},
+                    // GL ES 2 with user set 16 bit depth buffer without multisampling
+                    {EGL10.EGL_RED_SIZE, mConfigAttributes[0], EGL10.EGL_GREEN_SIZE, mConfigAttributes[1], EGL10.EGL_BLUE_SIZE, mConfigAttributes[2], EGL10.EGL_ALPHA_SIZE, mConfigAttributes[3], EGL10.EGL_DEPTH_SIZE, mConfigAttributes[4] >= 24 ? 16 : mConfigAttributes[4], EGL10.EGL_STENCIL_SIZE, mConfigAttributes[5], EGL10.EGL_SAMPLE_BUFFERS, 0, EGL10.EGL_SAMPLES, 0, EGL10.EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT, EGL10.EGL_NONE},
+                    // GL ES 2 by default
+                    {EGL10.EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT, EGL10.EGL_NONE}};
 
             EGLConfig result;
             for (int[] eglAttribute : EGLAttributes) {
                 result = this.doChooseConfig(egl, display, eglAttribute);
-                if (result != null)
-                    return result;
+                if (result != null) return result;
             }
 
             Log.e(DEVICE_POLICY_SERVICE, "Can not select an EGLConfig for rendering.");

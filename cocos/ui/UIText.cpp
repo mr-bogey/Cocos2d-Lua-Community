@@ -155,26 +155,24 @@ float Text::getFontSize()const
 
 void Text::setFontName(const std::string& name)
 {
-    std::string fontName = name.empty() ? CC_DEFAULT_FONT : name;
-
-    if(FileUtils::getInstance()->isFileExist(fontName))
+    if(FileUtils::getInstance()->isFileExist(name))
     {
         TTFConfig config = _labelRenderer->getTTFConfig();
-        config.fontFilePath = fontName;
+        config.fontFilePath = name;
         config.fontSize = _fontSize;
         _labelRenderer->setTTFConfig(config);
         _type = Type::TTF;
     }
     else
     {
-        _labelRenderer->setSystemFontName(fontName);
+        _labelRenderer->setSystemFontName(name);
         if (_type == Type::TTF)
         {
             _labelRenderer->requestSystemFontRefresh();
         }
         _type = Type::SYSTEM;
     }
-    _fontName = fontName;
+    _fontName = name;
     updateContentSizeWithTextureSize(_labelRenderer->getContentSize());
     _labelRendererAdaptDirty = true;
 }

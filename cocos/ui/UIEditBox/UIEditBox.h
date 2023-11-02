@@ -650,9 +650,6 @@ namespace ui {
 
         void openKeyboard() const;
 
-        void setFontPath(const std::string& fontName);
-        void setPlaceholderFontPath(const std::string& fontName);
-
     protected:
         virtual void releaseUpEvent() override;
 

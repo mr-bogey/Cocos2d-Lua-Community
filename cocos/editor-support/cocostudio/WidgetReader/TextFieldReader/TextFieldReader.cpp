@@ -26,8 +26,7 @@
 
 #include "editor-support/cocostudio/WidgetReader/TextFieldReader/TextFieldReader.h"
 
-//#include "ui/UITextField.h"
-#include "ui/UIEditBox/UIEditBox.h"
+#include "ui/UITextField.h"
 #include "platform/CCFileUtils.h"
 #include "editor-support/cocostudio/CocoLoader.h"
 #include "editor-support/cocostudio/CSParseBinary_generated.h"
@@ -85,7 +84,7 @@ namespace cocostudio
     {
         this->beginSetBasicProperties(widget);
         
-        EditBox* editBox = static_cast<EditBox*>(widget);
+        TextField* textField = static_cast<TextField*>(widget);
         
         stExpCocoNode *stChildArray = cocoNode->GetChildArray(cocoLoader);
         
@@ -99,19 +98,25 @@ namespace cocostudio
             CC_COLOR_PROPERTY_BINARY_READER
             
             else if(key == P_PlaceHolder){
-                editBox->setPlaceHolder(value.c_str());
+                textField->setPlaceHolder(value);
             }else if(key == P_Text){
-                editBox->setText(value.c_str());
+                textField->setString(value);
             }else if(key == P_FontSize){
-                editBox->setFontSize(valueToInt(value));
-                editBox->setPlaceholderFontSize(valueToInt(value));
+                textField->setFontSize(valueToInt(value));
             }else if(key == P_FontName){
-                editBox->setFontPath(value.c_str());
-                editBox->setPlaceholderFontPath(value.c_str());
+                textField->setFontName(value);
+            }else if(key == P_TouchSizeWidth){
+                textField->setTouchSize(Size(valueToFloat(value), textField->getTouchSize().height));
+            }else if(key == P_TouchSizeHeight){
+                textField->setTouchSize(Size(textField->getTouchSize().width,  valueToFloat(value)));
+            }else if (key == P_MaxLengthEnable){
+                textField->setMaxLengthEnabled(valueToBool(value));
             }else if(key == P_MaxLength){
-                editBox->setMaxLength(valueToInt(value));
+                textField->setMaxLength(valueToInt(value));
             }else if(key == P_PasswordEnable){
-                editBox->setInputFlag(valueToBool(value) ? EditBox::InputFlag::PASSWORD : EditBox::InputFlag::INITIAL_CAPS_ALL_CHARACTERS);
+                textField->setPasswordEnabled(valueToBool(value));
+            }else if(key == P_PasswordStyleText){
+                textField->setPasswordStyleText(value.c_str());
             }
         } //end of for loop
         this->endSetBasicProperties(widget);
@@ -122,22 +127,52 @@ namespace cocostudio
         WidgetReader::setPropsFromJsonDictionary(widget, options);
         
         
-        EditBox* editBox = static_cast<EditBox*>(widget);
+        TextField* textField = static_cast<TextField*>(widget);
         bool ph = DICTOOL->checkObjectExist_json(options, P_PlaceHolder);
         if (ph)
         {
-            editBox->setPlaceHolder(DICTOOL->getStringValue_json(options, P_PlaceHolder,"input words here"));
+            textField->setPlaceHolder(DICTOOL->getStringValue_json(options, P_PlaceHolder,"input words here"));
         }
-        editBox->setText(DICTOOL->getStringValue_json(options, P_Text,"Edit box"));
+        textField->setString(DICTOOL->getStringValue_json(options, P_Text,"Text Tield"));
        
-        editBox->setFontSize(DICTOOL->getIntValue_json(options, P_FontSize,20));
+        textField->setFontSize(DICTOOL->getIntValue_json(options, P_FontSize,20));
+    
+        std::string jsonPath = GUIReader::getInstance()->getFilePath();
+        std::string fontName = DICTOOL->getStringValue_json(options, P_FontName, "");
+        std::string fontFilePath = jsonPath.append(fontName);
+        if (FileUtils::getInstance()->isFileExist(fontFilePath))
+            textField->setFontName(fontFilePath);
+        else
+            textField->setFontName(fontName);
         
-        int maxLength = DICTOOL->getIntValue_json(options, P_MaxLength,10);
-        editBox->setMaxLength(maxLength);
-
+        bool tsw = DICTOOL->checkObjectExist_json(options, P_TouchSizeWidth);
+        bool tsh = DICTOOL->checkObjectExist_json(options, P_TouchSizeHeight);
+        if (tsw && tsh)
+        {
+            textField->setTouchSize(Size(DICTOOL->getFloatValue_json(options, P_TouchSizeWidth), DICTOOL->getFloatValue_json(options,P_TouchSizeHeight)));
+        }
+        
+//        float dw = DICTOOL->getFloatValue_json(options, "width");
+//        float dh = DICTOOL->getFloatValue_json(options, "height");
+//        if (dw > 0.0f || dh > 0.0f)
+//        {
+//            //textField->setSize(Size(dw, dh));
+//        }
+        bool maxLengthEnable = DICTOOL->getBooleanValue_json(options, P_MaxLengthEnable);
+        textField->setMaxLengthEnabled(maxLengthEnable);
+        
+        if (maxLengthEnable)
+        {
+            int maxLength = DICTOOL->getIntValue_json(options, P_MaxLength,10);
+            textField->setMaxLength(maxLength);
+        }
         bool passwordEnable = DICTOOL->getBooleanValue_json(options, P_PasswordEnable);
-
-        editBox->setInputFlag(passwordEnable ? EditBox::InputFlag::PASSWORD : EditBox::InputFlag::INITIAL_CAPS_ALL_CHARACTERS);
+        textField->setPasswordEnabled(passwordEnable);
+        if (passwordEnable)
+        {
+            textField->setPasswordStyleText(DICTOOL->getStringValue_json(options, P_PasswordStyleText,"*"));
+        }
+        
         
         WidgetReader::setColorPropsFromJsonDictionary(widget, options);
     }        
@@ -156,7 +191,7 @@ namespace cocostudio
         int fontSize = 20;
         std::string text = "";
         bool isLocalized = false;
-        std::string placeHolder = "Edit Box";
+        std::string placeHolder = "Text Field";
         bool passwordEnabled = false;
         std::string passwordStyleText = "*";
         bool maxLengthEnabled = false;
@@ -277,11 +312,11 @@ namespace cocostudio
     
     void TextFieldReader::setPropsWithFlatBuffers(cocos2d::Node *node, const flatbuffers::Table *textFieldOptions)
     {
-        EditBox* editBox = static_cast<EditBox*>(node);
+        TextField* textField = static_cast<TextField*>(node);
         auto options = (TextFieldOptions*)textFieldOptions;
         
         std::string placeholder = options->placeHolder()->c_str();
-        editBox->setPlaceHolder(placeholder.c_str());
+        textField->setPlaceHolder(placeholder);
         
         std::string text = options->text()->c_str();
         bool isLocalized = options->isLocalized() != 0;
@@ -292,51 +327,81 @@ namespace cocostudio
             std::string::size_type newlineIndex = localizedTxt.find('\n');
             if (newlineIndex != std::string::npos)
                 localizedTxt = localizedTxt.substr(0, newlineIndex);
-            editBox->setText(localizedTxt.c_str());
+            textField->setString(localizedTxt);
         }
         else
         {
-            editBox->setText(text.c_str());
+            textField->setString(text);
         }
         
         int fontSize = options->fontSize();
-        editBox->setFontSize(fontSize);
-        editBox->setPlaceholderFontSize(fontSize);
+        textField->setFontSize(fontSize);
         
         std::string fontName = options->fontName()->c_str();
-        editBox->setFontPath(fontName);
-        editBox->setPlaceholderFontPath(fontName);
+        textField->setFontName(fontName);
         
-        bool maxLengthEnabled = options->maxLengthEnabled();
-        int maxLength = options->maxLength();
-        editBox->setMaxLength(maxLengthEnabled ? maxLength : -1);
-
+        bool maxLengthEnabled = options->maxLengthEnabled() != 0;
+        textField->setMaxLengthEnabled(maxLengthEnabled);
+        
+        if (maxLengthEnabled)
+        {
+            int maxLength = options->maxLength();
+            textField->setMaxLength(maxLength);
+        }
         bool passwordEnabled = options->passwordEnabled() != 0;
-        editBox->setInputFlag(passwordEnabled ? EditBox::InputFlag::PASSWORD : EditBox::InputFlag::INITIAL_CAPS_ALL_CHARACTERS);
+        textField->setPasswordEnabled(passwordEnabled);
+        if (passwordEnabled)
+        {
+            std::string passwordStyleText = options->passwordStyleText()->c_str();
+            textField->setPasswordStyleText(passwordStyleText.c_str());
+        }
+        
+        
+        bool fileExist = false;
+        std::string errorFilePath = "";
+        auto resourceData = options->fontResource();
+        std::string path = resourceData->path()->c_str();
+        if (path != "")
+        {
+            if (FileUtils::getInstance()->isFileExist(path))
+            {
+                fileExist = true;
+            }
+            else
+            {
+                errorFilePath = path;
+                fileExist = false;
+            }
+            if (fileExist)
+            {
+                textField->setFontName(path);
+            }
+        }
         
         auto widgetReader = WidgetReader::getInstance();
         widgetReader->setPropsWithFlatBuffers(node, (Table*)options->widgetOptions());
         
-        editBox->setUnifySizeEnabled(false);
-        editBox->ignoreContentAdaptWithSize(false);
+        textField->setUnifySizeEnabled(false);
+        textField->ignoreContentAdaptWithSize(false);
         
-        editBox->setInputMode(EditBox::InputMode::ANY);
-        editBox->setPlaceholderFontColor(Color4B::GRAY);
         auto widgetOptions = options->widgetOptions();
-        auto color = widgetOptions->color();
-        editBox->setFontColor(Color4B(color->r(), color->g(), color->b(), color->a()));
+        if (!textField->isIgnoreContentAdaptWithSize())
+        {
+            ((Label*)(textField->getVirtualRenderer()))->setLineBreakWithoutSpace(true);
+            Size contentSize(widgetOptions->size()->width(), widgetOptions->size()->height());
+            textField->setContentSize(contentSize);
+        }
+        
+        
     }
     
     Node* TextFieldReader::createNodeWithFlatBuffers(const flatbuffers::Table *textFieldOptions)
     {
-        auto options = (TextFieldOptions*)textFieldOptions;
-        auto widgetOptions = options->widgetOptions();
-        Size contentSize(widgetOptions->size()->width(), widgetOptions->size()->height());
-        EditBox* editBox = EditBox::create(contentSize, Scale9Sprite::create());
+        TextField* textField = TextField::create();
         
-        setPropsWithFlatBuffers(editBox, (Table*)textFieldOptions);
+        setPropsWithFlatBuffers(textField, (Table*)textFieldOptions);
         
-        return editBox;
+        return textField;
     }
     
 }

@@ -55,10 +55,8 @@ public:
     virtual bool initWithSize(const Size& size) override;
 
     virtual void setFont(const char* pFontName, int fontSize) override;
-    virtual void setFontPath(const std::string& fontName) override;
     virtual void setFontColor(const Color4B& color) override;
     virtual void setPlaceholderFont(const char* pFontName, int fontSize) override;
-    virtual void setPlaceholderFontPath(const std::string& fontName) override;
     virtual void setPlaceholderFontColor(const Color4B& color) override;
     virtual void setInputMode(EditBox::InputMode inputMode) override;
     virtual void setInputFlag(EditBox::InputFlag inputFlag) override;

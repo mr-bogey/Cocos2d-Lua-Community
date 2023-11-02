@@ -1,18 +1,18 @@
 /****************************************************************************
  Copyright (c) 2017-2018 Xiamen Yaji Software Co., Ltd.
- 
+
  http://www.cocos2d-x.org
- 
+
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
  in the Software without restriction, including without limitation the rights
  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  copies of the Software, and to permit persons to whom the Software is
  furnished to do so, subject to the following conditions:
- 
+
  The above copyright notice and this permission notice shall be included in
  all copies or substantial portions of the Software.
- 
+
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -24,7 +24,6 @@
 
 package org.cocos2dx.lib;
 
-import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.os.Handler;
 import android.os.Looper;
@@ -43,7 +42,6 @@ public class Cocos2dxWebViewHelper {
     private static final String TAG = Cocos2dxWebViewHelper.class.getSimpleName();
     private static Handler sHandler;
     private static Cocos2dxActivity sCocos2dxActivity;
-    @SuppressLint("StaticFieldLeak")
     private static FrameLayout sLayout;
 
     private static SparseArray<Cocos2dxWebView> webViews;
@@ -128,8 +126,8 @@ public class Cocos2dxWebViewHelper {
             Cocos2dxWebView webView = webViews.get(index);
             if (webView != null) {
                 try {
-                    Method method = webView.getClass().getMethod("setAlpha",float.class);
-                    method.invoke(webView,opacity);
+                    Method method = webView.getClass().getMethod("setAlpha", float.class);
+                    method.invoke(webView, opacity);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -202,7 +200,7 @@ public class Cocos2dxWebViewHelper {
             Cocos2dxWebView webView = webViews.get(index);
             if (webView != null) {
                 webView.getSettings().setCacheMode(cleanCachedData ? WebSettings.LOAD_NO_CACHE
-                                                                   : WebSettings.LOAD_DEFAULT);
+                        : WebSettings.LOAD_DEFAULT);
                 webView.loadUrl(url);
             }
         });
@@ -237,7 +235,7 @@ public class Cocos2dxWebViewHelper {
     }
 
     public static <T> T callInMainThread(Callable<T> call) throws ExecutionException, InterruptedException {
-        FutureTask<T> task = new FutureTask<>(call);
+        FutureTask<T> task = new FutureTask<T>(call);
         sHandler.post(task);
         return task.get();
     }

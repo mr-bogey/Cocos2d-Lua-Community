@@ -1,32 +1,31 @@
 /****************************************************************************
-Copyright (c) 2010-2012 cocos2d-x.org
-Copyright (c) 2013-2016 Chukong Technologies Inc.
-Copyright (c) 2017-2018 Xiamen Yaji Software Co., Ltd.
+ Copyright (c) 2010-2012 cocos2d-x.org
+ Copyright (c) 2013-2016 Chukong Technologies Inc.
+ Copyright (c) 2017-2018 Xiamen Yaji Software Co., Ltd.
 
-http://www.cocos2d-x.org
+ http://www.cocos2d-x.org
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
+ The above copyright notice and this permission notice shall be included in
+ all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ THE SOFTWARE.
  ****************************************************************************/
 package org.cocos2dx.lib;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Looper;
@@ -42,7 +41,6 @@ import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
-import android.widget.TextView;
 
 
 public class Cocos2dxEditBoxHelper {
@@ -52,19 +50,23 @@ public class Cocos2dxEditBoxHelper {
 
     private static SparseArray<Cocos2dxEditBox> mEditBoxArray;
     private static int mViewTag = 0;
-    private static float mPadding = 5.0f;
+    private static final float mPadding = 5.0f;
+
     //Call native methods
     private static native void editBoxEditingDidBegin(int index);
-    public static void __editBoxEditingDidBegin(int index){
+
+    public static void __editBoxEditingDidBegin(int index) {
         editBoxEditingDidBegin(index);
     }
 
     private static native void editBoxEditingChanged(int index, String text);
-    public static void __editBoxEditingChanged(int index, String text){
+
+    public static void __editBoxEditingChanged(int index, String text) {
         editBoxEditingChanged(index, text);
     }
 
     private static native void editBoxEditingDidEnd(int index, String text, int action);
+
     public static void __editBoxEditingDidEnd(int index, String text, int action) {
         editBoxEditingDidEnd(index, text, action);
     }
@@ -74,11 +76,11 @@ public class Cocos2dxEditBoxHelper {
         Cocos2dxEditBoxHelper.mFrameLayout = layout;
 
         Cocos2dxEditBoxHelper.mCocos2dxActivity = (Cocos2dxActivity) Cocos2dxActivity.getContext();
-        Cocos2dxEditBoxHelper.mEditBoxArray = new SparseArray<Cocos2dxEditBox>();
+        Cocos2dxEditBoxHelper.mEditBoxArray = new SparseArray<>();
     }
 
-    public static int getPadding(float scaleX){
-        return (int)(mPadding*scaleX);
+    public static int getPadding(float scaleX) {
+        return (int) (mPadding * scaleX);
     }
 
     public static int createEditBox(final int left, final int top, final int width, final int height, final float scaleX) {
@@ -140,12 +142,13 @@ public class Cocos2dxEditBoxHelper {
             editBox.setOnFocusChangeListener((v, hasFocus) -> {
                 editBox.setTag(true);
                 editBox.setChangedTextProgrammatically(false);
+                Editable boxText = editBox.getText();
                 if (hasFocus) {
                     mCocos2dxActivity.runOnGLThread(() -> {
                         editBox.endAction = Cocos2dxEditBox.kEndActionUnknown;
                         Cocos2dxEditBoxHelper.__editBoxEditingDidBegin(index);
                     });
-                    editBox.setSelection(editBox.getText().length());
+                    editBox.setSelection(boxText == null ? 0 : boxText.length());
                     mFrameLayout.setEnableForceDoLayout(true);
                     mCocos2dxActivity.getGLSurfaceView().setSoftKeyboardShown(true);
                     Log.d(TAG, "edit box get focus");
@@ -153,7 +156,7 @@ public class Cocos2dxEditBoxHelper {
                     editBox.setVisibility(View.GONE);
                     // Note that we must to copy a string to prevent string content is modified
                     // on UI thread while 's.toString' is invoked at the same time.
-                    final String text = new String(editBox.getText().toString());
+                    final String text = boxText == null ? "" : boxText.toString();
                     mCocos2dxActivity.runOnGLThread(() -> {
                         int action = editBox.endAction;
                         Cocos2dxEditBoxHelper.__editBoxEditingDidEnd(index, text, action);
@@ -168,7 +171,7 @@ public class Cocos2dxEditBoxHelper {
                 // If the event is a key-down event on the "enter" button
                 if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
                         (keyCode == KeyEvent.KEYCODE_ENTER)) {
-                    //if editbox doesn't support multiline, just hide the keyboard
+                    //if editBox doesn't support multiline, just hide the keyboard
                     if ((editBox.getInputType() & InputType.TYPE_TEXT_FLAG_MULTI_LINE) != InputType.TYPE_TEXT_FLAG_MULTI_LINE) {
                         Cocos2dxEditBoxHelper.closeKeyboardOnUiThread(index);
                         return true;
@@ -206,7 +209,7 @@ public class Cocos2dxEditBoxHelper {
         });
     }
 
-    public static void setFont(final int index, final String fontName, final float fontSize){
+    public static void setFont(final int index, final String fontName, final float fontSize) {
         mCocos2dxActivity.runOnUiThread(() -> {
             Cocos2dxEditBox editBox = mEditBoxArray.get(index);
             if (editBox != null) {
@@ -214,22 +217,22 @@ public class Cocos2dxEditBoxHelper {
                 if (!fontName.isEmpty()) {
                     if (fontName.endsWith(".ttf")) {
                         try {
-                            tf = Cocos2dxTypefaces.get(Cocos2dxActivity.getContext(), fontName);
+                            tf = Cocos2dxTypefaces.get(mCocos2dxActivity, fontName);
                         } catch (final Exception e) {
                             Log.e("Cocos2dxEditBoxHelper", "error to create ttf type face: "
                                     + fontName);
                             // The file may not find, use system font.
-                            tf  =  Typeface.create(fontName, Typeface.NORMAL);
+                            tf = Typeface.create(fontName, Typeface.NORMAL);
                         }
                     } else {
-                        tf  =  Typeface.create(fontName, Typeface.NORMAL);
+                        tf = Typeface.create(fontName, Typeface.NORMAL);
                     }
 
-                }else{
+                } else {
                     tf = Typeface.DEFAULT;
                 }
                 // TODO: The font size is not the same across all the android devices...
-                if (fontSize >= 0){
+                if (fontSize >= 0) {
                     editBox.setTextSize(TypedValue.COMPLEX_UNIT_PX,
                             fontSize);
                 }
@@ -238,7 +241,7 @@ public class Cocos2dxEditBoxHelper {
         });
     }
 
-    public static void setFontColor(final int index, final int red, final int green, final int blue, final int alpha){
+    public static void setFontColor(final int index, final int red, final int green, final int blue, final int alpha) {
         mCocos2dxActivity.runOnUiThread(() -> {
             Cocos2dxEditBox editBox = mEditBoxArray.get(index);
             if (editBox != null) {
@@ -247,7 +250,7 @@ public class Cocos2dxEditBoxHelper {
         });
     }
 
-    public static void setPlaceHolderText(final int index, final String text){
+    public static void setPlaceHolderText(final int index, final String text) {
         mCocos2dxActivity.runOnUiThread(() -> {
             Cocos2dxEditBox editBox = mEditBoxArray.get(index);
             if (editBox != null) {
@@ -256,7 +259,7 @@ public class Cocos2dxEditBoxHelper {
         });
     }
 
-    public static void setPlaceHolderTextColor(final int index, final int red, final int green, final int blue, final int alpha){
+    public static void setPlaceHolderTextColor(final int index, final int red, final int green, final int blue, final int alpha) {
         mCocos2dxActivity.runOnUiThread(() -> {
             Cocos2dxEditBox editBox = mEditBoxArray.get(index);
             if (editBox != null) {
@@ -284,13 +287,13 @@ public class Cocos2dxEditBoxHelper {
     }
 
 
-    public static void setText(final int index, final String text){
+    public static void setText(final int index, final String text) {
         mCocos2dxActivity.runOnUiThread(() -> {
             Cocos2dxEditBox editBox = mEditBoxArray.get(index);
             if (editBox != null) {
                 editBox.setChangedTextProgrammatically(true);
                 editBox.setText(text);
-                int position = editBox.getText().length();
+                int position = text.length();
                 editBox.setSelection(position);
             }
         });
@@ -343,7 +346,6 @@ public class Cocos2dxEditBoxHelper {
     }
 
 
-
     public static void openKeyboard(final int index) {
 
         mCocos2dxActivity.runOnUiThread(() -> openKeyboardOnUiThread(index));
@@ -355,7 +357,7 @@ public class Cocos2dxEditBoxHelper {
             return;
         }
 
-        final InputMethodManager imm = (InputMethodManager) Cocos2dxActivity.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+        final InputMethodManager imm = (InputMethodManager) mCocos2dxActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
         Cocos2dxEditBox editBox = mEditBoxArray.get(index);
         if (null != editBox) {
             editBox.requestFocus();
@@ -370,8 +372,8 @@ public class Cocos2dxEditBoxHelper {
             Log.e(TAG, "closeKeyboardOnUiThread doesn't run on UI thread!");
             return;
         }
-        
-        final InputMethodManager imm = (InputMethodManager) Cocos2dxActivity.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+
+        final InputMethodManager imm = (InputMethodManager) mCocos2dxActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
         Cocos2dxEditBox editBox = mEditBoxArray.get(index);
         if (null != editBox) {
             imm.hideSoftInputFromWindow(editBox.getWindowToken(), 0);

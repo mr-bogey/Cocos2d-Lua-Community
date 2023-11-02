@@ -26,6 +26,7 @@ package org.cocos2dx.lib;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.nio.charset.StandardCharsets;
 
 public class GameControllerUtils {
 
@@ -55,7 +56,7 @@ public class GameControllerUtils {
             is.read(buffer);
             is.close();
 
-            return new String(buffer, "UTF-8");
+            return new String(buffer, StandardCharsets.UTF_8);
         } catch (Exception e) {
             e.printStackTrace();
         }

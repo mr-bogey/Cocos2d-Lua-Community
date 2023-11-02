@@ -255,37 +255,6 @@ THE SOFTWARE.
 #define CC_USE_PHYSICS 1
 #endif
 
-#if (CC_USE_PHYSICS)
-/** Use chipmunk physics 2d engine. */
-#ifndef CC_ENABLE_CHIPMUNK_INTEGRATION
-#define CC_ENABLE_CHIPMUNK_INTEGRATION 1
-#endif
-
-/** or use box2d physics 2d engine. */
-#ifndef CC_ENABLE_BOX2D_INTEGRATION
-#define CC_ENABLE_BOX2D_INTEGRATION 0
-#endif
-#endif // CC_USE_PHYSICS
-
-/** Use 3d physics integration API. */
-#ifndef CC_USE_3D_PHYSICS
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS || CC_TARGET_PLATFORM == CC_PLATFORM_MAC || CC_TARGET_PLATFORM == CC_PLATFORM_WIN32 || CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_LINUX)
-#define CC_USE_3D_PHYSICS 1
-#endif
-#endif
-
-#if (CC_USE_3D_PHYSICS)
-/** Use bullet physics engine. */
-#ifndef CC_ENABLE_BULLET_INTEGRATION
-#define CC_ENABLE_BULLET_INTEGRATION 1
-#endif
-#endif
-
-/** Use 3D navigation API */
-#ifndef CC_USE_NAVMESH
-#define CC_USE_NAVMESH 1
-#endif
-
 /** Use culling or not. */
 #ifndef CC_USE_CULLING
 #define CC_USE_CULLING 1
@@ -356,8 +325,4 @@ THE SOFTWARE.
  */
 #ifndef CC_STRIP_FPS
 #define CC_STRIP_FPS 0
-#endif
-
-#ifndef CC_DEFAULT_FONT
-#define CC_DEFAULT_FONT "default.ttf"
 #endif

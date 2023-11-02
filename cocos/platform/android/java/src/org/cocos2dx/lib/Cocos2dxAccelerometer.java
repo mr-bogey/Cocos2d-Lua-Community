@@ -39,6 +39,8 @@ public class Cocos2dxAccelerometer implements SensorEventListener {
     // Constants
     // ===========================================================
 
+    private static final String TAG = Cocos2dxAccelerometer.class.getSimpleName();
+
     // ===========================================================
     // Fields
     // ===========================================================
@@ -50,6 +52,7 @@ public class Cocos2dxAccelerometer implements SensorEventListener {
     private final int mNaturalOrientation;
     final float[] accelerometerValues = new float[3];
     final float[] compassFieldValues = new float[3];
+    static final float ALPHA = 0.25f; // if ALPHA = 1 OR 0, no filter applies.
 
     // ===========================================================
     // Constructors
@@ -63,7 +66,7 @@ public class Cocos2dxAccelerometer implements SensorEventListener {
         this.mCompass = this.mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
 
         final Display display = ((WindowManager) this.mContext.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
-        this.mNaturalOrientation = display.getRotation();
+        this.mNaturalOrientation = display.getOrientation();
     }
 
     // ===========================================================
@@ -130,6 +133,11 @@ public class Cocos2dxAccelerometer implements SensorEventListener {
 
             Cocos2dxGLSurfaceView.queueAccelerometer(x,y,z,sensorEvent.timestamp);
 
+            /*
+            if(BuildConfig.DEBUG) {
+                Log.d(TAG, "x = " + sensorEvent.values[0] + " y = " + sensorEvent.values[1] + " z = " + pSensorEvent.values[2]);
+            }
+            */
         }
         else if (sensorEvent.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
             // needed by VR code

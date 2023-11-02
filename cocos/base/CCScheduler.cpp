@@ -240,11 +240,6 @@ void TimerScriptHandler::cancel()
 
 }
 
-float TimerScriptHandler::getRemainTime()
-{
-    return _interval - _elapsed;
-}
-
 #endif
 
 // implementation of Scheduler
@@ -486,7 +481,7 @@ void Scheduler::schedulePerFrame(const ccSchedulerFunc& callback, void *target, 
         else
         {
             // don't add it again
-            //CCLOG("warning: don't update it again");
+            CCLOG("warning: don't update it again");
             return;
         }
     }
@@ -682,33 +677,6 @@ void Scheduler::unscheduleScriptEntry(unsigned int scheduleScriptEntryID)
             break;
         }
     }
-}
-
-float Scheduler::getRemainTime(unsigned int scheduleScriptEntryID)
-{
-    for (ssize_t i = _scriptHandlerEntries.size() - 1; i >= 0; i--)
-    {
-        SchedulerScriptHandlerEntry* entry = _scriptHandlerEntries.at(i);
-        if (entry->getEntryId() == (int)scheduleScriptEntryID)
-        {
-            TimerScriptHandler* timer = entry->getTimer();
-            return timer->getRemainTime();
-        }
-    }
-    return 0.0f;
-}
-
-bool Scheduler::isVaildHandle(unsigned int scheduleScriptEntryID)
-{
-    for (ssize_t i = _scriptHandlerEntries.size() - 1; i >= 0; i--)
-    {
-        SchedulerScriptHandlerEntry* entry = _scriptHandlerEntries.at(i);
-        if (entry->getEntryId() == (int)scheduleScriptEntryID)
-        {
-            return !entry->isMarkedForDeletion();
-        }
-    }
-    return false;
 }
 
 #endif

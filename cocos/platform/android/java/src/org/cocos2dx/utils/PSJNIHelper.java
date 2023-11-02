@@ -10,7 +10,7 @@ public class PSJNIHelper {
 	static ArrayList<String> mArrayList = null;
 	
 	public static void createHashMap(){
-		mHashMap = new HashMap<String, String>();
+		mHashMap = new HashMap<>();
 	}
 	
 	public static HashMap<String, String> getHashMap(){
@@ -25,7 +25,7 @@ public class PSJNIHelper {
 	}
 	
 	public static void createVector(){
-		mVector = new Vector<String>();
+		mVector = new Vector<>();
 	}
 	
 	public static Vector<String> getVector(){
@@ -40,7 +40,7 @@ public class PSJNIHelper {
 	}
 	
 	public static void createArrayList(){
-		mArrayList = new ArrayList<String>();
+		mArrayList = new ArrayList<>();
 	}
 	
 	public static ArrayList<String> getArrayList(){

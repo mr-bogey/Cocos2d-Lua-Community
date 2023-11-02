@@ -507,7 +507,7 @@ void Label::reset()
         _fontAtlas = nullptr;
     }
 
-    _currentLabelType = LabelType::TTF;
+    _currentLabelType = LabelType::STRING_TEXTURE;
     _currLabelEffect = LabelEffect::NORMAL;
     _contentDirty = false;
     _numberOfLines = 0;

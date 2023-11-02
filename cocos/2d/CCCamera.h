@@ -1,6 +1,7 @@
 /****************************************************************************
 Copyright (c) 2014-2016 Chukong Technologies Inc.
 Copyright (c) 2017-2019 Xiamen Yaji Software Co., Ltd.
+Copyright (c) 2023 cocos2d-lua.org
 
 http://www.cocos2d-x.org
 
@@ -28,14 +29,12 @@ THE SOFTWARE.
 #pragma once
 
 #include "2d/CCNode.h"
-#include "3d/CCFrustum.h"
 #include "renderer/CCQuadCommand.h"
 #include "renderer/CCCustomCommand.h"
 
 NS_CC_BEGIN
 
 class Scene;
-class CameraBackgroundBrush;
 
 /**
  * Note: 
@@ -199,31 +198,11 @@ public:
      * @param dst  The 3D world-space position.
      */
     void unprojectGL(const Size& size, const Vec3* src, Vec3* dst) const;
-
-    /**
-     * Is this aabb visible in frustum
-     */
-    bool isVisibleInFrustum(const AABB* aabb) const;
     
     /**
      * Get object depth towards camera
      */
     float getDepthInView(const Mat4& transform) const;
-    
-    /**
-     * set depth, camera with larger depth is drawn on top of camera with smaller depth, the depth of camera with CameraFlag::DEFAULT is 0, user defined camera is -1 by default
-     */
-    void setDepth(int8_t depth);
-    
-    /**
-     * get depth, camera with larger depth is drawn on top of camera with smaller depth, the depth of camera with CameraFlag::DEFAULT is 0, user defined camera is -1 by default
-     */
-    int8_t getDepth() const { return _depth; }
-    
-    /**
-     get rendered order
-     */
-    int getRenderOrder() const;
     
     /**
      * Get the frustum's far plane.
@@ -238,11 +217,8 @@ public:
     //override
     virtual void onEnter() override;
     virtual void onExit() override;
+    virtual void setTag(int tag) override;
 
-    /**
-     Before rendering scene with this camera, the background need to be cleared. It clears the depth buffer with max depth by default. Use setBackgroundBrush to modify the default behavior
-     */
-    void clearBackground();
     /**
      Apply the FBO, RenderTargets and viewport.
      */
@@ -254,20 +230,7 @@ public:
      */
     bool isViewProjectionUpdated() const {return _viewProjectionUpdated;}
 
-    /**
-     * set the background brush. See CameraBackgroundBrush for more information.
-     * @param clearBrush Brush used to clear the background
-     */
-    void setBackgroundBrush(CameraBackgroundBrush* clearBrush);
-
-    /**
-     * Get clear brush
-     */
-    CameraBackgroundBrush* getBackgroundBrush() const { return _clearBrush; }
-
     virtual void visit(Renderer* renderer, const Mat4 &parentTransform, uint32_t parentFlags) override;
-
-    bool isBrushValid();
 
 CC_CONSTRUCTOR_ACCESS:
     Camera();
@@ -307,11 +270,6 @@ protected:
     mutable bool  _viewProjectionDirty = true;
     bool _viewProjectionUpdated = false; //Whether or not the viewprojection matrix was updated since the last frame.
     CameraFlag _cameraFlag = CameraFlag::DEFAULT; // camera flag
-    mutable Frustum _frustum;   // camera frustum
-    mutable bool _frustumDirty = true;
-    int8_t  _depth = -1;                 //camera depth, the depth of camera with CameraFlag::DEFAULT flag is 0 by default, a camera with larger depth is drawn on top of camera with smaller depth
-
-    CameraBackgroundBrush* _clearBrush = nullptr; //brush used to clear the back ground
 };
 
 NS_CC_END

@@ -227,12 +227,11 @@ int LuaStack::executeString(const char *codes)
     return executeFunction(0);
 }
 
-#if defined(__aarch64__) || defined(__arm64__)
+#if defined(__aarch64__) || defined(__arm64__) || defined(__x86_64__)
 static const std::string BYTECODE_FILE_EXT = ".lua64";
 #else
 static const std::string BYTECODE_FILE_EXT = ".lua32";
 #endif
-
 static const std::string NOT_BYTECODE_FILE_EXT = ".lua";
 
 int LuaStack::executeScriptFile(const char* filename)

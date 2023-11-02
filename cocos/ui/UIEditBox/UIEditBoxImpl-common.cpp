@@ -100,8 +100,8 @@ void EditBoxImplCommon::initInactiveLabels(const Size& size)
 
     _labelPlaceHolder = Label::create();
     _labelPlaceHolder->setAnchorPoint(Vec2(0.0f, 1.0f));
-    _labelPlaceHolder->setOverflow(Label::Overflow::CLAMP);
     _labelPlaceHolder->setTextColor(Color4B::GRAY);
+    _labelPlaceHolder->enableWrap(false);
     _editBox->addChild(_labelPlaceHolder, kLabelZOrder);
 
     setFont(pDefaultFontName, size.height*2/3);
@@ -119,17 +119,17 @@ void EditBoxImplCommon::placeInactiveLabels(const Size& size)
         _label->setVerticalAlignment(TextVAlignment::TOP);
         _label->enableWrap(true);
 
-        _labelPlaceHolder->setPosition(Vec2((float)CC_EDIT_BOX_PADDING, size.height - CC_EDIT_BOX_PADDING));
+        _labelPlaceHolder->setPosition(Vec2((float)CC_EDIT_BOX_PADDING,
+                                            size.height - CC_EDIT_BOX_PADDING));
         _labelPlaceHolder->setVerticalAlignment(TextVAlignment::TOP);
-        _labelPlaceHolder->enableWrap(true);
     }
     else {
         _label->enableWrap(false);
         _label->setPosition(Vec2((float)CC_EDIT_BOX_PADDING, size.height));
         _label->setVerticalAlignment(TextVAlignment::CENTER);
 
-        _labelPlaceHolder->enableWrap(false);
-        _labelPlaceHolder->setPosition(Vec2((float)CC_EDIT_BOX_PADDING, (size.height + placeholderSize.height) / 2));
+        _labelPlaceHolder->setPosition(Vec2((float)CC_EDIT_BOX_PADDING,
+                                            (size.height + placeholderSize.height) / 2));
         _labelPlaceHolder->setVerticalAlignment(TextVAlignment::CENTER);
     }
 }
@@ -154,12 +154,6 @@ void EditBoxImplCommon::setInactiveText(const char* pText)
     {
         _label->setDimensions(maxSize.width, maxSize.height);
     }
-
-    Size labelPlaceHolderSize = _labelPlaceHolder->getContentSize();
-    if (labelPlaceHolderSize.width > maxSize.width || labelPlaceHolderSize.height > maxSize.height)
-    {
-        _labelPlaceHolder->setDimensions(maxSize.width, maxSize.height);
-    }
 }
 
 void EditBoxImplCommon::setFont(const char* pFontName, int fontSize)
@@ -174,24 +168,6 @@ void EditBoxImplCommon::setFont(const char* pFontName, int fontSize)
     if (fontSize > 0)
     {
         _label->setSystemFontSize(fontSize);
-    }
-}
-
-void EditBoxImplCommon::setFontPath(const std::string& fontName)
-{
-    std::string name = fontName.empty() ? CC_DEFAULT_FONT : fontName;
-    if (FileUtils::getInstance()->isFileExist(name)) {
-        std::string lowerCasedFontName = name;
-        std::transform(lowerCasedFontName.begin(), lowerCasedFontName.end(), lowerCasedFontName.begin(), ::tolower);
-        if (lowerCasedFontName.find(".fnt") != std::string::npos) {
-            _label->setBMFontFilePath(name);
-        }
-        else {
-            TTFConfig config = _label->getTTFConfig();
-            config.fontFilePath = name;
-            config.fontSize = _label->getRenderingFontSize();
-            _label->setTTFConfig(config);
-        }
     }
 }
 
@@ -214,24 +190,6 @@ void EditBoxImplCommon::setPlaceholderFont(const char* pFontName, int fontSize)
     if (fontSize > 0)
     {
         _labelPlaceHolder->setSystemFontSize(fontSize);
-    }
-}
-
-void EditBoxImplCommon::setPlaceholderFontPath(const std::string& fontName)
-{
-    std::string name = fontName.empty() ? CC_DEFAULT_FONT : fontName;
-    if (FileUtils::getInstance()->isFileExist(name)) {
-        std::string lowerCasedFontName = name;
-        std::transform(lowerCasedFontName.begin(), lowerCasedFontName.end(), lowerCasedFontName.begin(), ::tolower);
-        if (lowerCasedFontName.find(".fnt") != std::string::npos) {
-            _labelPlaceHolder->setBMFontFilePath(name);
-        }
-        else {
-            TTFConfig config = _labelPlaceHolder->getTTFConfig();
-            config.fontFilePath = name;
-            config.fontSize = _labelPlaceHolder->getRenderingFontSize();
-            _labelPlaceHolder->setTTFConfig(config);
-        }
     }
 }
 
@@ -312,7 +270,6 @@ void EditBoxImplCommon::setPlaceHolder(const char* pText)
         _placeHolder = pText;
         this->setNativePlaceHolder(pText);
         _labelPlaceHolder->setString(_placeHolder);
-        refreshInactiveText();
     }
 }
 

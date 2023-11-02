@@ -1,45 +1,43 @@
 /****************************************************************************
-Copyright (c) 2010-2012 cocos2d-x.org
-Copyright (c) 2013-2016 Chukong Technologies Inc.
-Copyright (c) 2017-2018 Xiamen Yaji Software Co., Ltd.
+ Copyright (c) 2010-2012 cocos2d-x.org
+ Copyright (c) 2013-2016 Chukong Technologies Inc.
+ Copyright (c) 2017-2018 Xiamen Yaji Software Co., Ltd.
 
-http://www.cocos2d-x.org
+ http://www.cocos2d-x.org
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
+ The above copyright notice and this permission notice shall be included in
+ all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ THE SOFTWARE.
  ****************************************************************************/
 package org.cocos2dx.lib;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.graphics.Typeface;
 import android.text.InputFilter;
 import android.text.InputType;
 import android.text.method.PasswordTransformationMethod;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
-import android.view.View;
 import android.view.inputmethod.EditorInfo;
-import android.widget.EditText;
 import android.widget.FrameLayout;
 
-public class Cocos2dxEditBox extends EditText {
+import androidx.appcompat.widget.AppCompatEditText;
+
+public class Cocos2dxEditBox extends AppCompatEditText {
     /**
      * The user is allowed to enter any text, including line breaks.
      */
@@ -101,7 +99,7 @@ public class Cocos2dxEditBox extends EditText {
     private final int kEditBoxInputFlagInitialCapsAllCharacters = 4;
 
     /**
-     *  Lowercase all characters automatically.
+     * Lowercase all characters automatically.
      */
     private final int kEditBoxInputFlagLowercaseAllCharacters = 5;
 
@@ -124,7 +122,7 @@ public class Cocos2dxEditBox extends EditText {
     private static final int kTextVerticalAlignmentCenter = 1;
     private static final int kTextVerticalAlignmentBottom = 2;
 
-    private int mInputFlagConstraints; 
+    private int mInputFlagConstraints;
     private int mInputModeConstraints;
     private int mMaxLength;
 
@@ -139,19 +137,19 @@ public class Cocos2dxEditBox extends EditText {
     private Boolean changedTextProgrammatically = false;
 
     //OpenGL view scaleX
-    private  float mScaleX;
+    private float mScaleX;
 
     // package private
     int endAction = kEndActionUnknown;
 
 
-    public  Cocos2dxEditBox(Context context){
+    public Cocos2dxEditBox(Context context) {
         super(context);
     }
 
     public void setEditBoxViewRect(int left, int top, int maxWidth, int maxHeight) {
         FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT,
-                                                                            FrameLayout.LayoutParams.WRAP_CONTENT);
+                FrameLayout.LayoutParams.WRAP_CONTENT);
         layoutParams.leftMargin = left;
         layoutParams.topMargin = top;
         layoutParams.width = maxWidth;
@@ -169,18 +167,14 @@ public class Cocos2dxEditBox extends EditText {
     }
 
 
-    public  void setMaxLength(int maxLength){
+    public void setMaxLength(int maxLength) {
         this.mMaxLength = maxLength;
 
-        this.setFilters(new InputFilter[]{new InputFilter.LengthFilter(this.mMaxLength) });
+        this.setFilters(new InputFilter[]{new InputFilter.LengthFilter(this.mMaxLength)});
     }
 
-    public void setMultilineEnabled(boolean flag){
-        if (flag){
-            this.mInputModeConstraints |= InputType.TYPE_TEXT_FLAG_MULTI_LINE;
-        } else {
-            this.mInputFlagConstraints ^= InputType.TYPE_TEXT_FLAG_MULTI_LINE;
-        }
+    public void setMultilineEnabled(boolean flag) {
+        this.mInputModeConstraints |= InputType.TYPE_TEXT_FLAG_MULTI_LINE;
     }
 
     public void setReturnType(int returnType) {
@@ -200,6 +194,7 @@ public class Cocos2dxEditBox extends EditText {
             case kKeyboardReturnTypeNext:
                 this.setImeOptions(EditorInfo.IME_ACTION_NEXT | EditorInfo.IME_FLAG_NO_EXTRACT_UI);
                 break;
+            case kKeyboardReturnTypeDefault:
             default:
                 this.setImeOptions(EditorInfo.IME_ACTION_NONE | EditorInfo.IME_FLAG_NO_EXTRACT_UI);
                 break;
@@ -210,39 +205,42 @@ public class Cocos2dxEditBox extends EditText {
         int gravity = this.getGravity();
         switch (alignment) {
             case kTextHorizontalAlignmentCenter:
-                gravity =(gravity & ~Gravity.RIGHT & ~Gravity.LEFT) | Gravity.CENTER_HORIZONTAL;
+                gravity = (gravity & ~Gravity.RIGHT & ~Gravity.LEFT) | Gravity.CENTER_HORIZONTAL;
                 break;
             case kTextHorizontalAlignmentRight:
-                gravity = (gravity & ~Gravity.LEFT) | Gravity.RIGHT ;
+                gravity = (gravity & ~Gravity.LEFT) | Gravity.RIGHT;
                 break;
+            case kTextHorizontalAlignmentLeft:
             default:
-                gravity = (gravity & ~Gravity.RIGHT) | Gravity.LEFT ;
+                gravity = (gravity & ~Gravity.RIGHT) | Gravity.LEFT;
                 break;
         }
         this.setGravity(gravity);
     }
-    
+
     public void setTextVerticalAlignment(int alignment) {
         int gravity = this.getGravity();
         int padding = Cocos2dxEditBoxHelper.getPadding(mScaleX);
         switch (alignment) {
             case kTextVerticalAlignmentTop:
-                setPadding(padding, padding*3/4, 0, 0);
-                gravity = (gravity & ~Gravity.BOTTOM) | Gravity.TOP ;
+                setPadding(padding, padding * 3 / 4, 0, 0);
+                gravity = (gravity & ~Gravity.BOTTOM) | Gravity.TOP;
                 break;
             case kTextVerticalAlignmentBottom:
-                gravity = (gravity & ~Gravity.TOP) | Gravity.BOTTOM ;
+                //TODO: Add appropriate padding when this alignment is used
+                gravity = (gravity & ~Gravity.TOP) | Gravity.BOTTOM;
                 break;
+            case kTextVerticalAlignmentCenter:
             default:
-                setPadding(padding, 0, 0, padding/2);
-                gravity =(gravity & ~Gravity.TOP & ~Gravity.BOTTOM) | Gravity.CENTER_VERTICAL;
+                setPadding(padding, 0, 0, padding / 2);
+                gravity = (gravity & ~Gravity.TOP & ~Gravity.BOTTOM) | Gravity.CENTER_VERTICAL;
                 break;
         }
 
         this.setGravity(gravity);
     }
 
-    public  void setInputMode(int inputMode){
+    public void setInputMode(int inputMode) {
         this.setTextHorizontalAlignment(kTextHorizontalAlignmentLeft);
         this.setTextVerticalAlignment(kTextVerticalAlignmentCenter);
         switch (inputMode) {
@@ -278,13 +276,15 @@ public class Cocos2dxEditBox extends EditText {
 
     @Override
     public boolean onKeyDown(final int pKeyCode, final KeyEvent pKeyEvent) {
-        if (pKeyCode == KeyEvent.KEYCODE_BACK) {
-            Cocos2dxActivity activity = (Cocos2dxActivity) this.getContext();
-            //To prevent program from going to background
-            activity.getGLSurfaceView().requestFocus();
-            return true;
+        switch (pKeyCode) {
+            case KeyEvent.KEYCODE_BACK:
+                Cocos2dxActivity activity = (Cocos2dxActivity) this.getContext();
+                //To prevent program from going to background
+                activity.getGLSurfaceView().requestFocus();
+                return true;
+            default:
+                return super.onKeyDown(pKeyCode, pKeyEvent);
         }
-        return super.onKeyDown(pKeyCode, pKeyEvent);
     }
 
     @Override

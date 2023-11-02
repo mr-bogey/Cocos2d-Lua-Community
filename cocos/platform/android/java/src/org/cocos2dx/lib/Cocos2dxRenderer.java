@@ -88,10 +88,12 @@ public class Cocos2dxRenderer implements GLSurfaceView.Renderer {
          * since onDrawFrame() was called by system 60 times per second by default.
          */
 
-        if (!(Cocos2dxRenderer.sAnimationInterval <= 1.0f / 60f * Cocos2dxRenderer.NANOSECONDSPERSECOND)) {
+        if (Cocos2dxRenderer.sAnimationInterval <= 1.0f / 60f * Cocos2dxRenderer.NANOSECONDSPERSECOND) {
+            Cocos2dxRenderer.nativeRender();
+        } else {
             final long now = System.nanoTime();
             final long interval = now - this.mLastTickInNanoSeconds;
-
+        
             if (interval < Cocos2dxRenderer.sAnimationInterval) {
                 try {
                     Thread.sleep((Cocos2dxRenderer.sAnimationInterval - interval) / Cocos2dxRenderer.NANOSECONDSPERMICROSECOND);
@@ -100,10 +102,10 @@ public class Cocos2dxRenderer implements GLSurfaceView.Renderer {
             }
             /*
              * Render time MUST be counted in, or the FPS will slower than appointed.
-             */
+            */
             this.mLastTickInNanoSeconds = System.nanoTime();
+            Cocos2dxRenderer.nativeRender();
         }
-        Cocos2dxRenderer.nativeRender();
     }
 
     // ===========================================================
@@ -146,6 +148,12 @@ public class Cocos2dxRenderer implements GLSurfaceView.Renderer {
     }
 
     public void handleOnPause() {
+        /**
+         * onPause may be invoked before onSurfaceCreated, 
+         * and engine will be initialized correctly after
+         * onSurfaceCreated is invoked. Can not invoke any
+         * native method before onSurfaceCreated is invoked
+         */
         if (! mNativeInitCompleted)
             return;
 
