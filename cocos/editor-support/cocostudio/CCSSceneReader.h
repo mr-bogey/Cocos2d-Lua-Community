@@ -1,4 +1,4 @@
-﻿/****************************************************************************
+/****************************************************************************
 Copyright (c) 2013-2016 Chukong Technologies Inc.
 Copyright (c) 2017-2018 Xiamen Yaji Software Co., Ltd.
 
@@ -63,7 +63,7 @@ public:
     static void destroyInstance();
     static const char* sceneReaderVersion();
     cocos2d::Node* createNodeWithSceneFile(const std::string &fileName, AttachComponentType attachComponent = AttachComponentType::EMPTY_NODE);
-    void setTarget(const std::function<void(cocos2d::Ref* obj, void* doc)>& selector);
+    void setTarget(const std::function<void(cocos2d::Ref*, void*)>& selector);
     cocos2d::Node* getNodeByTag(int nTag);
     inline AttachComponentType getAttachComponentType(){return _attachComponent;}
 CC_CONSTRUCTOR_ACCESS:
